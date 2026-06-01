@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0D9488">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Simu Salama - Mfumo wa Ufuatiliaji</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        /* ... EXISTING CSS VARIABLES ... */
+        :root {
+            --primary:#0D9488;--primary-dark:#0F766E;--primary-light:#CCFBF1;
+            --accent:#F59E0B;--accent-light:#FEF3C7;
+            --success:#10B981;--success-glow:rgba(16,185,129,0.25);
+            --warning:#F59E0B;--warning-glow:rgba(245,158,11,0.25);
+            --danger:#EF4444;--danger-glow:rgba(239,68,68,0.25);
+            --bg:#F0FDFA;--bg2:#E6FAF5;
+            --card:rgba(255,255,255,0.88);--card-solid:#ffffff;
+            --text:#134E4A;--text2:#5F7A77;--text3:#8BA8A3;
+            --border:rgba(13,148,136,0.12);
+            --radius:18px;--shadow:0 4px 24px rgba(13,148,136,0.08);--shadow-lg:0 12px 40px rgba(13,148,136,0.14);
+            --tr:all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        @media(prefers-color-scheme:dark){
+            :root{--bg:#0C1A18;--bg2:#112420;--card:rgba(17,36,32,0.92);--card-solid:#163029;
+            --text:#D5F0EC;--text2:#8BA8A3;--text3:#5A7974;--border:rgba(13,148,136,0.2);
+            --primary-light:rgba(13,148,136,0.14);--accent-light:rgba(245,158,11,0.1);
+            --shadow:0 4px 24px rgba(0,0,0,0.35);--shadow-lg:0 12px 40px rgba(0,0,0,0.45);}
+        }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;overflow-x:hidden;}
+        body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 20% 50%,rgba(13,148,136,0.07)0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(245,158,11,0.05)0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(16,185,129,0.05)0%,transparent 50%);animation:bgS 20s ease-in-out infinite alternate;z-index:0;pointer-events:none;}
+        @keyframes bgS{0%{transform:translate(0,0) rotate(0deg);}100%{transform:translate(-5%,3%) rotate(3deg);}}
+
+        /* AUTH & GENERAL STYLES (From original code) */
+        .auth-screen{position:fixed;top:0;left:0;width:100%;height:100%;z-index:5000;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0A3D38 0%,#0F766E 40%,#14B8A6 100%);transition:opacity .5s,visibility .5s;}
+        .auth-screen.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+        .auth-card{position:relative;background:rgba(255,255,255,0.96);border-radius:24px;padding:2.2rem 1.8rem;width:92%;max-width:440px;box-shadow:0 25px 60px rgba(0,0,0,0.3);animation:sU .6s ease;}
+        @media(prefers-color-scheme:dark){.auth-card{background:rgba(12,26,24,0.97);}}
+        @keyframes sU{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);}}
+        
+        /* Header, Cards, Inputs, etc. - Kept mostly original for brevity */
+        header{position:sticky;top:0;z-index:100;background:var(--card);backdrop-filter:blur(20px);padding:.8rem 1.2rem;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+        .logo{display:flex;align-items:center;gap:12px;}
+        .brand-title{font-weight:800;font-size:1.2rem;color:var(--primary);letter-spacing:-0.03em;}
+        .card{background:var(--card);backdrop-filter:blur(10px);border-radius:var(--radius);padding:1.3rem;box-shadow:var(--shadow);border:1px solid var(--border);transition:var(--tr);margin-bottom:1.2rem;}
+        .btn-call, .auth-btn, .save-btn, .btn-add, .hdr-btn{cursor:pointer;border:none;outline:none;font-family:inherit;}
+        /* ... (Assume other original styles are present) ... */
+
+        /* =========================================
+           NEW: MENTAL RESET MODE STYLES
+           ========================================= */
+        
+        /* Overlay zote */
+        .full-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:6000;display:none;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;padding:2rem;background:rgba(0,0,0,0.93);backdrop-filter:blur(8px);}
+        .full-overlay.active{display:flex;animation:fadeIn .5s;}
+        @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+        /* Reset Step 1: Breathing */
+        .reset-breathing-container{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;}
+        .breathing-circle-large{width:200px;height:200px;border-radius:50%;background:conic-gradient(from 0deg, #10B981, #0D9488, #0F766E);box-shadow:0 0 50px rgba(16,185,129,0.4);display:flex;align-items:center;justify-content:center;margin-bottom:2rem;position:relative;transition:transform 4s ease-in-out;}
+        
+        /* The inner circle that expands/contracts */
+        .breathing-inner{width:180px;height:180px;border-radius:50%;background:#0C1A18;border:2px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;flex-direction:column;transition:all 4s ease-in-out; position: relative; overflow: hidden;}
+        
+        /* Animation States controlled by JS class */
+        .breathing-inner.inhale{transform:scale(1.3); background: rgba(16,185,129,0.1); border-color: #10B981;}
+        .breathing-inner.hold{transform:scale(1.3); background: rgba(16,185,129,0.2); border-color: #F59E0B;}
+        .breathing-inner.exhale{transform:scale(1.0); background: rgba(16,185,129,0.05); border-color: #0D9488;}
+
+        .instruction-icon{font-size:48px; margin-bottom:10px; color: var(--success);}
+        .instruction-text{font-size:1.5rem;font-weight:700;margin-bottom:5px; text-transform: uppercase; letter-spacing: 1px;}
+        .sub-instruction{font-size:0.9rem; opacity:0.8; color: #ccc;}
+        
+        .breathing-cycle-count{margin-top:1rem;font-size:1.1rem;color:var(--accent);font-weight:600;}
+        .cycle-bar{width:200px;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;margin-top:10px;overflow:hidden;}
+        .cycle-progress{height:100%;width:0%;background:var(--success);transition:width 0.3s;}
+
+        /* Status Indicators during Reset */
+        .reset-status-bar{position:absolute;top:20px;display:flex;gap:15px;background:rgba(255,255,255,0.1);padding:8px 16px;border-radius:30px;font-size:0.85rem;backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,0.1);}
+        .status-item{display:flex;align-items:center;gap:6px;}
+        .status-dot{width:8px;height:8px;border-radius:50%;background:#10B981;box-shadow:0 0 8px #10B981;}
+
+        /* Reset Step 2: Control Screen */
+        .reset-controls-screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:400px;}
+        .reset-controls-screen.active{display:flex;animation:slideUp 0.4s ease;}
+        @keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+
+        .control-card{background:var(--card-solid);color:var(--text);border-radius:20px;padding:2rem;width:100%;box-shadow:0 10px 40px rgba(0,0,0,0.5);text-align:center;}
+        .control-card h2{margin-bottom:0.5rem;color:var(--primary-dark);}
+        .control-card p{margin-bottom:1.5rem;color:var(--text2);font-size:0.95rem;}
+
+        .control-btn-group{display:flex;flex-direction:column;gap:12px;}
+        .ctrl-btn{padding:14px;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;border:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:10px;transition:var(--tr);width:100%;}
+        
+        .ctrl-btn.continue{background:var(--primary-light);color:var(--primary-dark);border-color:var(--primary);}
+        .ctrl-btn.resume{background:var(--primary);color:white; box-shadow:0 4px 15px rgba(13,148,136,0.3);}
+        .ctrl-btn.extend{background:transparent;color:var(--text2);border:2px solid var(--border);}
+
+        .ctrl-btn:hover{transform:translateY(-2px);filter:brightness(0.95);}
+        .ctrl-btn.resume:hover{background:var(--primary-dark);filter:brightness(1);}
+
+        /* Responsive */
+        @media(max-width:600px){
+            .breathing-circle-large, .breathing-inner{width:160px;height:160px;}
+            .instruction-text{font-size:1.2rem;}
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== MENTAL RESET OVERLAY ===== -->
+<div class="full-overlay" id="mentalResetOverlay">
+    
+    <!-- Status Bar (Top) -->
+    <div class="reset-status-bar">
+        <div class="status-item"><div class="status-dot"></div> Silent</div>
+        <div class="status-item"><div class="status-dot" style="background:#F59E0B"></div> Auto-Reply</div>
+        <div class="status-item"><div class="status-dot" style="background:#EF4444"></div> Apps Blocked</div>
+    </div>
+
+    <!-- STEP 1: BREATHING GUIDE -->
+    <div id="resetStep1" class="reset-breathing-container">
+        <div class="breathing-circle-large">
+            <div class="breathing-inner" id="breathingCircle">
+                <span class="material-icons-round instruction-icon" id="breathIcon">air</span>
+                <div class="instruction-text" id="breathText">Andaa</div>
+            </div>
+        </div>
+        
+        <p class="sub-instruction" id="breathSubText">Follow the circle...</p>
+        
+        <div class="breathing-cycle-count">
+            Mzunguko: <span id="cycleCounter">0</span> / 5
+        </div>
+        <div class="cycle-bar"><div class="cycle-progress" id="cycleProgress"></div></div>
+    </div>
+
+    <!-- STEP 2: CONTROL SCREEN -->
+    <div id="resetStep2" class="reset-controls-screen">
+        <div class="control-card">
+            <div style="font-size:3rem;margin-bottom:10px;">🧠</div>
+            <h2>Mental Reset Mode</h2>
+            <p>Umefanya mazoezi ya kupumua. Unachotaka kufanya sasa?</p>
+            
+            <div class="control-btn-group">
+                <button class="ctrl-btn continue" onclick="app.handleResetAction('continue')">
+                    <span class="material-icons-round">self_improvement</span> 
+                    Endelea Kupumzika (Zaidi)
+                </button>
+                
+                <button class="ctrl-btn resume" onclick="app.handleResetAction('resume')">
+                    <span class="material-icons-round">lock_open</span> 
+                    Resume (Rudi kwenye App)
+                </button>
+                
+                <button class="ctrl-btn extend" onclick="app.handleResetAction('extend')">
+                    <span class="material-icons-round">timer</span> 
+                    Endelea Muda (Zidisha Dakika 2)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== LOCK SCREEN (Existing) ===== -->
+<div class="full-overlay" id="lockOverlay">
+    <div class="breathing-circle-large" style="width:150px;height:150px">
+        <span class="material-icons-round" style="font-size:48px; color: #fff;">self_improvement</span>
+    </div>
+    <h2>Unahitaji Mapumziko</h2>
+    <p style="color:#ddd; margin-bottom:20px;">Unapumua sana. Fanya mazoezi ya kupumua kufungua simu.</p>
+    <div class="lock-timer" id="lockTimer" style="font-size:2rem;font-weight:900;margin-bottom:1rem;font-family:monospace;">00:30</div>
+    <button class="lock-btn" id="lockBtn" onclick="app.unlockPhone()" style="padding:12px 30px;background:var(--primary);color:white;border:none;border-radius:30px;font-size:1.1rem;font-weight:700;cursor:pointer;margin-top:20px;opacity:0.5;pointer-events:none;transition:var(--tr);">Fungua Sasa</button>
+</div>
+
+<!-- ===== AUTH SCREEN (Original) ===== -->
+<div class="auth-screen" id="authScreen">
+    <!-- ... Original Auth Content ... -->
+    <div class="auth-card">
+        <div class="auth-logo">
+            <h1>Simu Salama</h1>
+            <p>Simu Salama, Akili yako salama, maisha yako bora</p>
+        </div>
+        <!-- Login Form Placeholder for brevity -->
+        <div style="text-align:center; margin-top:20px;">
+            <button class="auth-btn" onclick="auth.login()">Ingia (Demo)</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<main id="appMain" style="display:none; max-width:920px; margin:1.2rem auto; padding:0 1rem;">
+
+    <!-- Overall Status (EDITED TO ADD BUTTON) -->
+    <div class="card overall-status" style="background:linear-gradient(135deg,var(--primary-dark)0%,var(--primary)100%);border-radius:var(--radius);padding:1.3rem;color:white;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;box-shadow:0 8px 30px rgba(13,148,136,0.25);">
+        <span class="material-icons-round" style="font-size:44px;opacity:.9">verified_user</span>
+        <div class="status-info" style="flex:1;min-width:180px;">
+            <h2 id="overallTitle" style="font-size:1.2rem;font-weight:800;margin-bottom:3px;">Hali yako iko sawa</h2>
+            <p id="overallDesc" style="font-size:.85rem;opacity:.85;">Matumizi yako ya kidijitali yako salama.</p>
+            <div style="margin-top:10px;">
+                <!-- NEW MENTAL RESET BUTTON -->
+                <button onclick="app.startMentalReset()" style="background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:0.2s;">
+                    <span class="material-icons-round" style="font-size:16px">psychology</span> Mental Reset
+                </button>
+            </div>
+        </div>
+        <div class="overall-tl">
+            <div style="width:20px;height:20px;border-radius:50%;background:#10B981;border:2px solid white;"></div>
+        </div>
+    </div>
+
+    <!-- Other Sections (Placeholders) -->
+    <section class="card">
+        <h3 class="card-title">Jumuiya</h3>
+        <p>Maudhui mengine...</p>
+    </section>
+
+</main>
+
+<div class="toast" id="toast" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a3632;color:white;padding:12px 24px;border-radius:12px;z-index:4000;opacity:0;transition:all .4s;pointer-events:none;max-width:90%;text-align:center;"></div>
+
+<script>
+/* ===================================================
+   MENTAL RESET LOGIC
+   =================================================== */
+const MentalReset = {
+    isActive: false,
+    step: 1, // 1 = Breathing, 2 = Controls
+    cycleCount: 0,
+    maxCycles: 5,
+    timer: null,
+    
+    // DOM Elements
+    get overlay() { return document.getElementById('mentalResetOverlay'); },
+    get step1() { return document.getElementById('resetStep1'); },
+    get step2() { return document.getElementById('resetStep2'); },
+    get circle() { return document.getElementById('breathingCircle'); },
+    get text() { return document.getElementById('breathText'); },
+    get subText() { return document.getElementById('breathSubText'); },
+    get icon() { return document.getElementById('breathIcon'); },
+    get counter() { return document.getElementById('cycleCounter'); },
+    get progress() { return document.getElementById('cycleProgress'); },
+
+    start() {
+        this.isActive = true;
+        this.step = 1;
+        this.cycleCount = 0;
+        
+        // UI Updates
+        this.overlay.classList.add('active');
+        this.step1.style.display = 'flex';
+        this.step2.classList.remove('active');
+        
+        // Simulate System Effects
+        app.showToast('Silent Mode Imewashwa');
+        app.showToast('Auto-Reply Imewashwa: "Nitakujibu baadaye..."');
+        
+        // Start Breathing Loop
+        this.startBreathingCycle();
+    },
+
+    startBreathingCycle() {
+        if (!this.isActive) return;
+        this.cycleCount = 0;
+        this.updateUI();
+        
+        // Initial delay before starting first breath
+        setTimeout(() => {
+            this.runBreathPhase();
+        }, 1000);
+    },
+
+    runBreathPhase() {
+        if (!this.isActive) return;
+
+        // Phase 1: Inhale (4s)
+        this.setPhase('inhale', 'Vuta Pumzi', 'Kwa dakika 4...', 4000);
+        
+        this.timer = setTimeout(() => {
+            if (!this.isActive) return;
+            
+            // Phase 2: Hold (4s)
+            this.setPhase('hold', 'Shikilia', 'Usitoe pumzi...', 4000);
+            
+            this.timer = setTimeout(() => {
+                if (!this.isActive) return;
+                
+                // Phase 3: Exhale (6s - Average of 6-8s for web flow)
+                this.setPhase('exhale', 'Toa Polepole', 'Kwa dakika 6-8...', 6000);
+                
+                this.timer = setTimeout(() => {
+                    if (!this.isActive) return;
+                    this.completeCycle();
+                }, 6000);
+            }, 4000);
+        }, 4000);
+    },
+
+    setPhase(phase, mainText, subText, duration) {
+        // Clear previous classes
+        this.circle.classList.remove('inhale', 'hold', 'exhale');
+        // Add new class
+        this.circle.classList.add(phase);
+        
+        // Update Text
+        this.text.textContent = mainText;
+        this.subText.textContent = subText;
+        
+        // Update Icon
+        if(phase === 'inhale') this.icon.textContent = 'air';
+        if(phase === 'hold') this.icon.textContent = 'block';
+        if(phase === 'exhale') this.icon.textContent = 'cloud';
+    },
+
+    completeCycle() {
+        this.cycleCount++;
+        this.updateUI();
+
+        if (this.cycleCount >= this.maxCycles) {
+            // Finished breathing exercises, show controls
+            this.transitionToControls();
+        } else {
+            // Continue to next breath
+            this.runBreathPhase();
+        }
+    },
+
+    transitionToControls() {
+        this.step1.style.display = 'none';
+        this.step2.style.display = 'flex';
+        // Small delay for animation class
+        setTimeout(() => {
+            this.step2.classList.add('active');
+        }, 50);
+    },
+
+    updateUI() {
+        this.counter.textContent = this.cycleCount;
+        const pct = (this.cycleCount / this.maxCycles) * 100;
+        this.progress.style.width = pct + '%';
+    },
+
+    action(type) {
+        if (type === 'continue') {
+            // Restart breathing
+            this.step2.classList.remove('active');
+            setTimeout(() => {
+                this.step2.style.display = 'none';
+                this.step1.style.display = 'flex';
+                this.startBreathingCycle();
+            }, 300);
+        } else if (type === 'extend') {
+            // Add 2 more cycles
+            this.maxCycles += 2;
+            this.showToast('Muda umongezwa. Endelea kupumua.');
+            // Go back to breathing
+            this.action('continue');
+        } else if (type === 'resume') {
+            this.end();
+        }
+    },
+
+    end() {
+        this.isActive = false;
+        clearTimeout(this.timer);
+        this.overlay.classList.remove('active');
+        this.step2.classList.remove('active');
+        
+        // Restore System State
+        app.showToast('Reset Imekomaa. Karibu tena!');
+    }
+};
+
+/* ===================================================
+   MAIN APP OBJECT (Modified)
+   =================================================== */
+const app = {
+    // ... existing properties ...
+    
+    // Link Mental Reset
+    startMentalReset() {
+        MentalReset.start();
+    },
+    
+    handleResetAction(actionType) {
+        MentalReset.action(actionType);
+    },
+
+    // Helper to show messages
+    showToast(msg) {
+        const t = document.getElementById('toast'); 
+        t.textContent = msg; 
+        t.classList.add('show');
+        clearTimeout(this._tt); 
+        this._tt = setTimeout(() => t.classList.remove('show'), 3000);
+    }
+};
+
+/* ===================================================
+   AUTH OBJECT (Mock for Demo)
+   =================================================== */
+const auth = {
+    currentUser: null,
+    login() {
+        document.getElementById('authScreen').classList.add('hidden');
+        document.getElementById('appMain').style.display = 'block';
+        app.showToast('Karibu kwenye Simu Salama');
+    }
+};
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+    // Check if user is logged in (mock logic)
+    // auth.showAuth();
+});
+
+</script>
+</body>
+</html>

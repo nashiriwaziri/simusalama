@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimuSalama - Tumia Simu, Linda Akili</title>
+    <style>
+        /* CSS Reset and Variables */
+        :root {
+            --primary-color: #00897b; /* Teal for mental health/calm vibe */
+            --primary-dark: #005f56;
+            --secondary-color: #e0f2f1;
+            --text-color: #333;
+            --text-light: #666;
+            --error-color: #d32f2f;
+            --success-color: #388e3c;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(#e0f2f1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            overflow: hidden;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            background: var(--card-bg);
+            min-height: 550px;
+            position: relative;
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+            top: 30px;
+        }
+        .toast.success { background: var(--success-color); }
+        .toast.error { background: var(--error-color); }
+
+        /* Left Panel - Branding */
+        .brand-section {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .brand-logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .brand-tagline {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .brand-features {
+            margin-top: 40px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .feature-item {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .feature-icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        /* Right Panel - Forms */
+        .form-section {
+            flex: 1.2;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Form Logic */
+        .form-container {
+            transition: var(--transition);
+        }
+
+        .form-header {
+            margin-bottom: 30px;
+        }
+
+        .form-header h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .switch-text {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .switch-text a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .switch-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dashboard View (Hidden by default) */
+        #dashboard-view {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--secondary-color);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .card h3 {
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                margin: 20px;
+            }
+            .brand-section {
+                padding: 30px;
+            }
+            .form-section {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast">Action feedback message</div>
+
+    <div class="container">
+        <!-- Left Panel: Branding -->
+        <section class="brand-section">
+            <div class="brand-logo">SimuSalama</div>
+            <div class="brand-tagline">Tumia Simu, Linda Akili</div>
+            
+            <div class="brand-features">
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span> Dashbodi ya Utawala
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span> Hali ya Kisaikolojia
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span> Usalama wa Mtandaoni
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Panel: Auth Forms & Dashboard -->
+        <section class="form-section">
+            
+            <!-- Sign In Form -->
+            <div id="signin-form" class="form-container">
+                <div class="form-header">
+                    <h2>Karibu Tena</h2>
+                    <p>Ingia kwenye akaunti yako</p>
+                </div>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label for="loginEmail">Barua pepe</label>
+                        <input type="email" id="loginEmail" placeholder="jina@mfano.co" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="loginPassword">Nenosiri</label>
+                        <input type="password" id="loginPassword" placeholder="********" required>
+                    </div>
+                    <button type="submit" class="btn">Ingia (Sign In)</button>
+                </form>
+                <div class="switch-text">
+                    Hauna akaunti? <a href="#" onclick="toggleView('signup')">Jiunge Sasa (Sign Up)</a>
+                </div>
+            </div>
+
+            <!-- Sign Up Form -->
+            <div id="signup-form" class="form-container hidden">
+                <div class="form-header">
+                    <h2>Jiunge Nasi</h2>
+                    <p>Create your SimuSalama account</p>
+                </div>
+                <form id="registerForm">
+                    <div class="input-group">
+                        <label for="regName">Jina Kamili</label>
+                        <input type="text" id="regName" placeholder="Jina lako" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="regEmail">Barua pepe</label>
+                        <input type="email" id="regEmail" placeholder="jina@mfano.co" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="regPassword">Nenosiri</label>
+                        <input type="password" id="regPassword" placeholder="********" required>
+                    </div>
+                    <button type="submit" class="btn">Jiunge (Sign Up)</button>
+                </form>
+                <div class="switch-text">
+                    Tayari una akaunti? <a href="#" onclick="toggleView('signin')">Ingia (Sign In)</a>
+                </div>
+            </div>
+
+            <!-- Dashboard (Admin/User) -->
+            <div id="dashboard-view">
+                <div class="dashboard-header">
+                    <div>
+                        <h2>Dashbodi</h2>
+                        <p id="welcome-msg">Karibu</p>
+                    </div>
+                    <div class="user-profile">
+                        <span id="user-name-display">Mtumiaji</span>
+                        <img src="https://picsum.photos/seed/simusalama/40/40" alt="Avatar" class="avatar">
+                        <button onclick="logout()" style="background:none; border:none; color:var(--error-color); cursor:pointer; margin-left:10px; font-weight:bold;">Toa</button>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>Hali ya Kisaikolojia</h3>
+                        <p>Angalia ripoti za afya ya akili</p>
+                    </div>
+                    <div class="card">
+                        <h3>Watumiaji</h3>
+                        id="user-count">0</p>
+                    </div>
+                    <div class="card">
+                        <h3>Mipangilio</h3>
+                        <p>Gusa simu salama</p>
+                    </div>
+                    <div class="card">
+                        <h3>Msaada</h3>
+                        <p>Wasiliana na admin</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const SUPER_ADMIN_EMAIL = "nashiriwaziri29@gamil.co";
+        const SUPER_ADMIN_PASS = "WAZIRI2015";
+
+        // --- DOM Elements ---
+        const toast = document.getElementById('toast');
+        const signinView = document.getElementById('signin-form');
+        const signupView = document.getElementById('signup-form');
+        const dashboardView = document.getElementById('dashboard-view');
+        const welcomeMsg = document.getElementById('welcome-msg');
+        const userNameDisplay = document.getElementById('user-name-display');
+        
+        // --- Event Listeners ---
+        
+        // Handle Sign Up
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            
+            // Simulate API call
+            setTimeout(() => {
+                showToast(`Hongera ${name}, akaunti imetengwa!`, 'success');
+                // Auto login after signup
+                enterDashboard(name, email, false);
+            }, 800);
+        });
+
+        // Handle Sign In
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('loginEmail');
+            const passwordInput = document.getElementById('loginPassword');
+            
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            // 1. Check for Super Admin
+            if (email === SUPER_ADMIN_EMAIL && password === SUPER_ADMIN_PASS) {
+                // SUCCESS: Admin Login
+                showToast("Ingia kama Super Admin imefanikiwa", 'success');
+                
+                // SECURITY REQUIREMENT: Hide User and Password after single Sign In
+                // We clear the values immediately
+                emailInput.value = "";
+                passwordInput.value = "";
+                
+                // Enter Dashboard as Admin
+                enterDashboard("Super Admin", email, true);
+            } 
+            // 2. Mock check for normal users (for demonstration)
+            else if (email && password) {
+                // Simulating a normal user login
+                showToast("Imefanikiwa! Karibu.", 'success');
+                // Clear inputs for security
+                emailInput.value = "";
+                passwordInput.value = "";
+                
+                // Enter Dashboard as Normal User
+                enterDashboard("Mtumiaji", email, false);
+            } 
+            else {
+                showToast("Tafadhali jaza sehemu zote.", 'error');
+            }
+        });
+
+        // --- Functions ---
+
+        function toggleView(view) {
+            if (view === 'signup') {
+                signinView.classList.add('hidden');
+                signupView.classList.remove('hidden');
+            } else {
+                signupView.classList.add('hidden');
+                signinView.classList.remove('hidden');
+            }
+        }
+
+        function enterDashboard(name, email, isAdmin) {
+            // Hide all forms
+            signinView.classList.add('hidden');
+            signupView.classList.add('hidden');
+            
+            // Show Dashboard
+            dashboardView.style.display = 'flex';
+            
+            // Update UI based on role
+            userNameDisplay.textContent = name;
+            if (isAdmin) {
+                welcomeMsg.textContent = "Uboresho wa Mfumo (Super Admin Panel)";
+                document.body.style.setProperty('--primary-color', '#1a237e'); // Change color for admin
+            } else {
+                welcomeMsg.textContent = "Tumia Simu, Linda Akili";
+            }
+        }
+
+        function logout() {
+            dashboardView.style.display = 'none';
+            signinView.classList.remove('hidden');
+            // Reset color
+            document.body.style.setProperty('--primary-color', '#00897b');
+            showToast("Umetoka kwenye akaunti.", 'success');
+        }
+
+        function showToast(message, type) {
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            
+            setTimeout(() => {
+                toast.className = toast.className.replace('show', '');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
