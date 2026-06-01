@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0D9488">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Simu Salama - Mfumo wa Ufuatiliaji</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --primary:#0D9488;--primary-dark:#0F766E;--primary-light:#CCFBF1;
+            --accent:#F59E0B;--accent-light:#FEF3C7;
+            --success:#10B981;--success-glow:rgba(16,185,129,0.25);
+            --warning:#F59E0B;--warning-glow:rgba(245,158,11,0.25);
+            --danger:#EF4444;--danger-glow:rgba(239,68,68,0.25);
+            --bg:#F0FDFA;--bg2:#E6FAF5;
+            --card:rgba(255,255,255,0.88);--card-solid:#ffffff;
+            --text:#134E4A;--text2:#5F7A77;--text3:#8BA8A3;
+            --border:rgba(13,148,136,0.12);
+            --radius:18px;--shadow:0 4px 24px rgba(13,148,136,0.08);--shadow-lg:0 12px 40px rgba(13,148,136,0.14);
+            --tr:all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        @media(prefers-color-scheme:dark){
+            :root{--bg:#0C1A18;--bg2:#112420;--card:rgba(17,36,32,0.92);--card-solid:#163029;
+            --text:#D5F0EC;--text2:#8BA8A3;--text3:#5A7974;--border:rgba(13,148,136,0.2);
+            --primary-light:rgba(13,148,136,0.14);--accent-light:rgba(245,158,11,0.1);
+            --shadow:0 4px 24px rgba(0,0,0,0.35);--shadow-lg:0 12px 40px rgba(0,0,0,0.45);}
+        }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;overflow-x:hidden;}
+        body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 20% 50%,rgba(13,148,136,0.07)0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(245,158,11,0.05)0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(16,185,129,0.05)0%,transparent 50%);animation:bgS 20s ease-in-out infinite alternate;z-index:0;pointer-events:none;}
+        @keyframes bgS{0%{transform:translate(0,0) rotate(0deg);}100%{transform:translate(-5%,3%) rotate(3deg);}}
+
+        /* AUTH STYLES */
+        .auth-screen{position:fixed;top:0;left:0;width:100%;height:100%;z-index:5000;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0A3D38 0%,#0F766E 40%,#14B8A6 100%);transition:opacity .5s,visibility .5s;}
+        .auth-screen.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+        .auth-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 70%,rgba(245,158,11,0.18)0%,transparent 50%),radial-gradient(circle at 70% 30%,rgba(255,255,255,0.06)0%,transparent 40%);}
+        .auth-card{position:relative;background:rgba(255,255,255,0.96);border-radius:24px;padding:2.2rem 1.8rem;width:92%;max-width:440px;box-shadow:0 25px 60px rgba(0,0,0,0.3);animation:sU .6s ease;}
+        @media(prefers-color-scheme:dark){.auth-card{background:rgba(12,26,24,0.97);}}
+        @keyframes sU{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);}}
+        
+        .auth-logo{text-align:center;margin-bottom:1.2rem;}
+        .auth-logo-img{width:80px;height:auto;margin-bottom:10px;display:inline-block;}
+        .auth-logo h1{font-size:1.6rem;font-weight:900;color:var(--primary-dark);margin-top:6px;letter-spacing:-0.02em;}
+        @media(prefers-color-scheme:dark){.auth-logo h1{color:#5EEAD4;}}
+        .auth-logo p{font-size:.85rem;color:var(--text3);margin-top:4px;font-weight:500;}
+
+        .auth-tabs{display:flex;gap:0;margin-bottom:1.2rem;border-radius:12px;overflow:hidden;border:2px solid var(--border);}
+        .auth-tab{flex:1;padding:10px;border:none;background:transparent;font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;color:var(--text2);transition:var(--tr);}
+        .auth-tab.active{background:var(--primary);color:white;}
+        .auth-form{display:none;}.auth-form.active{display:block;}
+        .form-group{margin-bottom:.9rem;}
+        .form-group label{display:block;font-weight:600;font-size:.82rem;margin-bottom:5px;color:var(--text2);}
+        .form-input{width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:12px;font-family:inherit;font-size:.92rem;background:var(--bg);color:var(--text);outline:none;transition:var(--tr);}
+        .form-input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(13,148,136,0.1);}
+        .auth-btn{width:100%;padding:13px;background:var(--primary);color:white;border:none;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;transition:var(--tr);margin-top:.4rem;}
+        .auth-btn:hover{background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 6px 20px rgba(13,148,136,0.3);}
+        .auth-error{color:var(--danger);font-size:.82rem;margin-top:.4rem;min-height:1.1em;text-align:center;}
+        .auth-link{text-align:center;margin-top:.8rem;}
+        .auth-link button{background:none;border:none;color:var(--primary);font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;text-decoration:underline;}
+        .auth-link button:hover{color:var(--primary-dark);}
+        .auth-hint{text-align:center;font-size:.72rem;color:var(--text3);margin-top:.8rem;}
+        .auth-hint strong{color:var(--primary);}
+
+        /* HEADER & LOGO */
+        header{position:sticky;top:0;z-index:100;background:var(--card);backdrop-filter:blur(20px);padding:.8rem 1.2rem;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+        .logo{display:flex;align-items:center;gap:12px;}
+        .app-logo-img{height:45px;width:auto;object-fit:contain;}
+        .brand-info{display:flex;flex-direction:column;justify-content:center;line-height:1.1;}
+        .brand-title{font-weight:800;font-size:1.2rem;color:var(--primary);letter-spacing:-0.03em;}
+        .brand-tagline{font-size:.65rem;color:var(--text3);font-weight:500;white-space:nowrap;}
+
+        .header-right{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
+        .active-users-badge{display:flex;align-items:center;gap:5px;background:var(--success-glow);color:var(--success);padding:5px 12px;border-radius:20px;font-size:.75rem;font-weight:700;}
+        .active-dot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:pulse 1.5s infinite;}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.3);}}
+        .user-badge{display:flex;align-items:center;gap:5px;background:var(--primary-light);color:var(--primary);padding:5px 12px;border-radius:20px;font-size:.75rem;font-weight:600;}
+        .role-badge{font-size:.6rem;padding:2px 7px;border-radius:10px;font-weight:700;text-transform:uppercase;}
+        .role-badge.super_admin{background:var(--danger);color:white;}
+        .role-badge.admin{background:var(--accent);color:white;}
+        .role-badge.user{background:var(--primary-light);color:var(--primary);}
+        .hdr-btn{background:none;border:none;cursor:pointer;color:var(--text2);padding:7px;border-radius:50%;transition:var(--tr);}
+        .hdr-btn:hover{background:var(--primary-light);color:var(--primary);}
+        .device-badge{display:flex;align-items:center;gap:4px;background:var(--accent-light);color:#D97706;padding:4px 10px;border-radius:16px;font-size:.7rem;font-weight:600;}
+
+        /* MAIN */
+        main{position:relative;z-index:1;max-width:920px;margin:1.2rem auto;padding:0 1rem;display:flex;flex-direction:column;gap:1.2rem;}
+
+        /* TRAFFIC LIGHT */
+        .traffic-light{display:inline-flex;align-items:center;gap:7px;padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:700;letter-spacing:.02em;}
+        .traffic-light.green{background:rgba(16,185,129,0.12);color:#059669;}
+        .traffic-light.yellow{background:rgba(245,158,11,0.15);color:#D97706;}
+        .traffic-light.red{background:rgba(239,68,68,0.12);color:#DC2626;}
+        .tl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+        .traffic-light.green .tl-dot{background:#10B981;box-shadow:0 0 8px var(--success-glow);}
+        .traffic-light.yellow .tl-dot{background:#F59E0B;box-shadow:0 0 8px var(--warning-glow);animation:blink 1s infinite;}
+        .traffic-light.red .tl-dot{background:#EF4444;box-shadow:0 0 12px var(--danger-glow);animation:blink .6s infinite;}
+        @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+        /* CARDS */
+        .card{background:var(--card);backdrop-filter:blur(10px);border-radius:var(--radius);padding:1.3rem;box-shadow:var(--shadow);border:1px solid var(--border);transition:var(--tr);}
+        .card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);}
+        .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem;flex-wrap:wrap;gap:8px;}
+        .card-title{font-size:.95rem;font-weight:700;color:var(--text);}
+        .card-subtitle{font-size:.75rem;color:var(--text3);font-weight:400;}
+
+        /* OVERALL STATUS & STRESS METER */
+        .overall-status{background:linear-gradient(135deg,var(--primary-dark)0%,var(--primary)100%);border-radius:var(--radius);padding:1.3rem;color:white;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;box-shadow:0 8px 30px rgba(13,148,136,0.25);}
+        .overall-status .big-icon{font-size:44px;opacity:.9;}
+        .overall-status .status-info{flex:1;min-width:180px;}
+        .overall-status h2{font-size:1.2rem;font-weight:800;margin-bottom:3px;}
+        .overall-status p{font-size:.85rem;opacity:.85;}
+        .overall-tl{display:flex;gap:8px;align-items:center;}
+        .tl-circle{width:22px;height:22px;border-radius:50%;border:3px solid rgba(255,255,255,0.3);transition:var(--tr);}
+        .tl-circle.a-green{background:#10B981;border-color:#10B981;box-shadow:0 0 12px rgba(16,185,129,0.6);}
+        .tl-circle.a-yellow{background:#F59E0B;border-color:#F59E0B;box-shadow:0 0 12px rgba(245,158,11,0.6);}
+        .tl-circle.a-red{background:#EF4444;border-color:#EF4444;box-shadow:0 0 12px rgba(239,68,68,0.6);animation:blink .6s infinite;}
+
+        .stress-meter-container{margin-top:10px; width:100%; background:rgba(255,255,255,0.2); height:8px; border-radius:4px; overflow:hidden; position:relative;}
+        .stress-fill{height:100%; width:0%; transition: width 1s ease, background-color 0.5s ease;}
+        .stress-label{font-size:.7rem; margin-top:4px; opacity:.9; font-weight:600;}
+
+        /* PSYCHOLOGY SELF-ASSESSMENT */
+        .psych-card{border:2px solid var(--border);border-radius:var(--radius);padding:1.3rem;margin-bottom:1rem;transition:var(--tr);}
+        .psych-card:hover{border-color:var(--primary);}
+        .psych-card.active-level{border-width:3px;box-shadow:0 0 20px rgba(13,148,136,0.15);}
+        .psych-card.level-green{border-color:var(--success);}.psych-card.level-green.active-level{box-shadow:0 0 20px var(--success-glow);}
+        .psych-card.level-yellow{border-color:var(--warning);}.psych-card.level-yellow.active-level{box-shadow:0 0 20px var(--warning-glow);}
+        .psych-card.level-red{border-color:var(--danger);}.psych-card.level-red.active-level{box-shadow:0 0 20px var(--danger-glow);}
+        .psych-header{display:flex;align-items:center;gap:10px;margin-bottom:.8rem;}
+        .psych-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;}
+        .psych-dot.g{background:var(--success);}.psych-dot.y{background:var(--warning);}.psych-dot.r{background:var(--danger);animation:blink .8s infinite;}
+        .psych-header h3{font-size:.95rem;font-weight:700;}
+        .psych-level-badge{margin-left:auto;font-size:.65rem;padding:2px 8px;border-radius:10px;font-weight:700;text-transform:uppercase;}
+        .psych-level-badge.lb-green{background:var(--success-glow);color:#059669;}
+        .psych-level-badge.lb-yellow{background:var(--warning-glow);color:#D97706;}
+        .psych-level-badge.lb-red{background:var(--danger-glow);color:#DC2626;}
+        .psych-symptoms{list-style:none;padding:0;}
+        .psych-symptoms li{padding:6px 0 6px 24px;position:relative;font-size:.85rem;color:var(--text2);line-height:1.5;border-bottom:1px solid var(--border);}
+        .psych-symptoms li:last-child{border-bottom:none;}
+        .psych-symptoms li::before{content:'';position:absolute;left:0;top:12px;width:8px;height:8px;border-radius:50%;border:2px solid var(--primary);background:transparent;}
+        .psych-symptoms.level-red li::before{border-color:var(--danger);background:var(--danger-glow);}
+        .psych-symptoms.level-yellow li::before{border-color:var(--warning);background:var(--warning-glow);}
+        .psych-symptoms.level-green li::before{border-color:var(--success);background:var(--success-glow);}
+        .psych-you-are{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;font-size:.82rem;font-weight:700;margin-top:.8rem;}
+
+        /* TRAFFIC LIGHT CHAT VIEW */
+        .tl-chat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+        .tl-chat-item{background:var(--primary-light);border-radius:14px;padding:1rem;text-align:center;border-left:4px solid var(--primary);transition:var(--tr);cursor:default;}
+        .tl-chat-item:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+        .tl-chat-item .material-icons-round{font-size:28px;margin-bottom:6px;}
+        .tl-chat-item .tl-chat-name{font-size:.82rem;font-weight:700;margin-bottom:4px;}
+        .tl-chat-item .tl-chat-count{font-size:.75rem;color:var(--text3);}
+        .tl-chat-item.status-green{border-left-color:var(--success);background:rgba(16,185,129,0.06);}
+        .tl-chat-item.status-yellow{border-left-color:var(--warning);background:rgba(245,158,11,0.08);}
+        .tl-chat-item.status-red{border-left-color:var(--danger);background:rgba(239,68,68,0.08);}
+
+        /* ANNOUNCEMENTS */
+        .announcement-card{border-left:4px solid var(--accent);background:var(--accent-light);border-radius:0 var(--radius) var(--radius) 0;padding:1.1rem;margin-bottom:.8rem;animation:sI .4s ease;}
+        @keyframes sI{from{opacity:0;transform:translateX(-20px);}to{opacity:1;transform:translateX(0);}}
+        .announcement-card h3{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:5px;}
+        .announcement-card p{font-size:.88rem;color:var(--text2);}
+        .announcement-card img{max-width:100%;border-radius:12px;margin-top:8px;max-height:280px;object-fit:cover;}
+        .announcement-meta{font-size:.72rem;color:var(--text3);margin-top:6px;}
+        .announcement-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+        .ann-btn{padding:5px 12px;border:none;border-radius:8px;font-family:inherit;font-size:.75rem;font-weight:600;cursor:pointer;transition:var(--tr);display:flex;align-items:center;gap:4px;}
+        .ann-btn.hide{background:var(--warning-glow);color:#D97706;}.ann-btn.show{background:var(--success-glow);color:#059669;}.ann-btn.delete{background:var(--danger-glow);color:#DC2626;}.ann-btn.edit{background:var(--primary-light);color:var(--primary);}
+        .ann-btn:hover{filter:brightness(.9);transform:translateY(-1px);}
+        .no-announcements{text-align:center;padding:1.5rem;color:var(--text3);}
+
+        /* CALL TRACKING */
+        .call-tracking{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:.8rem;}
+        .call-stat{background:var(--primary-light);border-radius:14px;padding:.9rem;text-align:center;position:relative;overflow:hidden;}
+        .call-stat .material-icons-round{font-size:26px;}
+        .call-stat .stat-num{font-size:1.8rem;font-weight:900;color:var(--primary);}
+        .call-stat .stat-label{font-size:.75rem;color:var(--text2);font-weight:500;}
+        .call-stat.made .material-icons-round{color:var(--success);}.call-stat.received .material-icons-round{color:var(--accent);}
+        .phone-display{text-align:center;padding:.7rem;background:var(--primary-light);border-radius:12px;margin-bottom:.8rem;font-size:1rem;font-weight:600;}
+        .phone-display .material-icons-round{vertical-align:middle;margin-right:5px;color:var(--primary);}
+        .phone-display.blocked{background:var(--danger-glow);}.phone-display.blocked .material-icons-round{color:var(--danger);}
+        .call-actions{display:flex;gap:8px;flex-wrap:wrap;}
+        .btn-call{flex:1;min-width:100px;padding:11px;border:none;border-radius:12px;font-size:.88rem;font-weight:600;cursor:pointer;transition:var(--tr);display:flex;align-items:center;justify-content:center;gap:5px;font-family:inherit;text-decoration:none;}
+        .btn-call.primary{background:var(--success);color:white;}.btn-call.primary:hover{filter:brightness(.9);transform:translateY(-1px);}
+        .btn-call.primary.disabled-call{background:var(--text3);cursor:not-allowed;pointer-events:none;}
+        .btn-call.secondary{background:var(--primary-light);color:var(--primary);}.btn-call.secondary:hover{filter:brightness(.95);}
+        .btn-call.secondary.disabled-call{background:var(--text3);color:#999;cursor:not-allowed;pointer-events:none;}
+        .btn-call.danger{background:transparent;color:var(--danger);border:2px solid var(--danger);}.btn-call.danger:hover{background:var(--danger-glow);}
+
+        /* REGISTERED NUMBERS */
+        .reg-numbers-section{background:var(--bg);border-radius:14px;padding:1rem;margin-bottom:1rem;border:2px dashed var(--border);}
+        .reg-numbers-section h4{font-size:.82rem;font-weight:700;color:var(--text2);margin-bottom:.6rem;display:flex;align-items:center;gap:5px;}
+        .reg-num-list{max-height:160px;overflow-y:auto;margin-bottom:.6rem;}
+        .reg-num-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--card-solid);border-radius:10px;margin-bottom:4px;border-left:4px solid var(--primary);transition:var(--tr);}
+        .reg-num-item.active-num{border-left-color:var(--success);background:rgba(16,185,129,0.08);}
+        .reg-num-item .num-text{font-weight:600;font-size:.88rem;}
+        .reg-num-item .num-badge{font-size:.62rem;padding:2px 7px;border-radius:8px;font-weight:700;background:var(--success-glow);color:var(--success);margin-left:6px;}
+        .reg-num-item .num-actions{display:flex;gap:3px;}
+        .reg-num-item .num-actions button{background:none;border:none;cursor:pointer;padding:3px;border-radius:50%;transition:var(--tr);color:var(--text3);}
+        .reg-num-item .num-actions button:hover{background:var(--primary-light);color:var(--primary);}
+        .reg-num-item .num-actions button.del-num:hover{background:var(--danger-glow);color:var(--danger);}
+        .reg-add-row{display:flex;gap:5px;}
+        .reg-add-row .form-input{flex:1;}
+        .empty-reg{text-align:center;padding:.7rem;color:var(--text3);font-size:.82rem;}
+        .reg-warning{display:flex;align-items:flex-start;gap:7px;padding:9px 12px;background:var(--danger-glow);border-radius:10px;margin-bottom:.6rem;font-size:.78rem;color:#DC2626;font-weight:500;line-height:1.5;}
+        .reg-warning .material-icons-round{font-size:18px;flex-shrink:0;margin-top:1px;}
+
+        /* MOOD */
+        .mood-selector{display:flex;justify-content:space-around;margin-top:.8rem;}
+        .mood-btn{background:none;border:2px solid transparent;border-radius:50%;width:48px;height:48px;font-size:24px;cursor:pointer;transition:var(--tr);display:flex;align-items:center;justify-content:center;}
+        .mood-btn.selected{background:var(--primary-light);border-color:var(--primary);transform:scale(1.15);}
+        .mood-btn:hover{background:var(--primary-light);transform:scale(1.05);}
+
+        /* LINKS */
+        .links-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;}
+        .link-btn{display:flex;flex-direction:column;align-items:center;padding:.8rem .4rem;background:var(--primary-light);border:none;border-radius:14px;cursor:pointer;color:var(--text);transition:var(--tr);text-decoration:none;text-align:center;font-family:inherit;border-left:4px solid var(--link-color,var(--primary));}
+        .link-btn:hover{filter:brightness(.92);transform:translateY(-2px);box-shadow:var(--shadow);}
+        .link-btn .material-icons-round{font-size:24px;margin-bottom:5px;}
+        .link-btn span:last-child{font-size:.75rem;font-weight:600;}
+
+        /* CHART */
+        .chart-container{display:flex;align-items:flex-end;height:140px;gap:10px;margin-top:.8rem;padding-bottom:4px;border-bottom:2px solid var(--border);}
+        .bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;}
+        .bar{width:100%;border-radius:6px 6px 0 0;transition:height 1s ease;position:relative;min-height:3px;}
+        .bar.green-bar{background:linear-gradient(to top,#059669,#10B981);}.bar.yellow-bar{background:linear-gradient(to top,#D97706,#F59E0B);}.bar.red-bar{background:linear-gradient(to top,#DC2626,#EF4444);}
+        .bar:hover{filter:brightness(1.1);}
+        .bar::after{content:attr(data-val);position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:.7rem;font-weight:700;color:var(--text);opacity:0;transition:opacity .2s;white-space:nowrap;}
+        .bar:hover::after{opacity:1;}
+        .bar-label{font-size:.7rem;color:var(--text2);font-weight:600;}
+
+        /* PARENT LINK */
+        .govern-section{background:linear-gradient(135deg,rgba(245,158,11,0.06),rgba(13,148,136,0.06));border:2px solid var(--accent);border-radius:var(--radius);padding:1.3rem;}
+        .govern-code{font-family:monospace;font-size:1.4rem;font-weight:900;color:var(--accent);background:var(--accent-light);padding:10px 20px;border-radius:12px;text-align:center;letter-spacing:.1em;user-select:all;}
+        .govern-devices{margin-top:1rem;}
+        .govern-device{display:flex;align-items:center;gap:10px;padding:10px;background:var(--card-solid);border-radius:12px;margin-bottom:6px;border-left:4px solid var(--primary);}
+        .govern-device.cheat-flagged{border-left-color:var(--danger);background:rgba(239,68,68,0.05);}
+        .govern-device .gd-info{flex:1;min-width:0;}
+        .govern-device .gd-name{font-weight:700;font-size:.85rem;}.govern-device .gd-detail{font-size:.72rem;color:var(--text3);}
+        .govern-device .gd-status{font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:8px;}
+        .govern-device .gd-status.safe{background:var(--success-glow);color:#059669;}.govern-device .gd-status.warn{background:var(--warning-glow);color:#D97706;}.govern-device .gd-status.cheat{background:var(--danger-glow);color:#DC2626;animation:blink .8s infinite;}
+
+        /* CHEAT DETECTION */
+        .cheat-section{border:2px solid var(--danger);border-radius:var(--radius);padding:1.3rem;background:rgba(239,68,68,0.03);}
+        .cheat-status{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;margin-bottom:1rem;font-weight:700;font-size:.9rem;}
+        .cheat-status.safe{background:var(--success-glow);color:#059669;}
+        .cheat-status.flagged{background:var(--danger-glow);color:#DC2626;}
+        .cheat-log{max-height:200px;overflow-y:auto;}
+        .cheat-log-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--card-solid);border-radius:10px;margin-bottom:5px;border-left:3px solid var(--danger);font-size:.8rem;}
+        .cheat-log-item .cl-time{font-size:.7rem;color:var(--text3);white-space:nowrap;font-weight:600;}
+        .cheat-log-item .cl-msg{flex:1;color:var(--text2);}
+        .cheat-sms{margin-top:1rem;padding:12px;background:var(--danger-glow);border-radius:12px;display:flex;align-items:center;gap:10px;font-size:.82rem;color:#DC2626;font-weight:600;}
+        .cheat-sms .material-icons-round{font-size:24px;}
+
+        /* ADMIN */
+        .admin-panel{display:none;}.admin-panel.visible{display:block;}
+        .admin-section{margin-bottom:1.3rem;}
+        .admin-section h3{font-size:.95rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;margin-bottom:.8rem;padding-bottom:7px;border-bottom:2px solid var(--border);}
+        .user-table{width:100%;border-collapse:collapse;}
+        .user-table th{text-align:left;padding:9px 10px;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);border-bottom:2px solid var(--border);font-weight:700;}
+        .user-table td{padding:9px 10px;font-size:.82rem;border-bottom:1px solid var(--border);vertical-align:middle;}
+        .user-table tr:hover td{background:var(--primary-light);}
+        .user-table .actions{display:flex;gap:5px;flex-wrap:wrap;}
+        .tbl-btn{padding:4px 10px;border:none;border-radius:8px;font-family:inherit;font-size:.72rem;font-weight:600;cursor:pointer;transition:var(--tr);display:flex;align-items:center;gap:3px;}
+        .tbl-btn.role-up{background:var(--success-glow);color:#059669;}.tbl-btn.role-down{background:var(--warning-glow);color:#D97706;}.tbl-btn.del{background:var(--danger-glow);color:#DC2626;}
+        .tbl-btn:hover{filter:brightness(.85);}
+
+        /* ANN FORM */
+        .ann-form{margin-bottom:1.3rem;}.ann-form .form-group{margin-bottom:.7rem;}
+        .ann-form textarea{width:100%;padding:10px;border:2px solid var(--border);border-radius:12px;font-family:inherit;font-size:.88rem;background:var(--bg);color:var(--text);outline:none;resize:vertical;min-height:70px;transition:var(--tr);}
+        .ann-form textarea:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(13,148,136,0.1);}
+        .file-upload{display:flex;align-items:center;gap:8px;margin-top:5px;}
+        .file-upload label{padding:7px 14px;background:var(--primary-light);color:var(--primary);border-radius:10px;font-weight:600;font-size:.82rem;cursor:pointer;transition:var(--tr);display:flex;align-items:center;gap:5px;}
+        .file-upload label:hover{background:var(--primary);color:white;}.file-upload input{display:none;}
+        .file-upload .file-name{font-size:.78rem;color:var(--text3);}
+        .img-preview{margin-top:8px;position:relative;display:inline-block;}
+        .img-preview img{max-width:180px;border-radius:12px;border:2px solid var(--border);}
+        .img-preview .remove-img{position:absolute;top:-7px;right:-7px;width:26px;height:26px;border-radius:50%;background:var(--danger);color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+        .btn-submit{padding:11px 22px;background:var(--primary);color:white;border:none;border-radius:12px;font-family:inherit;font-size:.88rem;font-weight:700;cursor:pointer;transition:var(--tr);margin-top:.4rem;}
+        .btn-submit:hover{background:var(--primary-dark);transform:translateY(-1px);}
+        .btn-cancel-edit{padding:11px 22px;background:var(--text3);color:white;border:none;border-radius:12px;font-family:inherit;font-size:.88rem;font-weight:700;cursor:pointer;transition:var(--tr);margin-top:.4rem;display:none;}
+        .btn-cancel-edit:hover{background:var(--text2);}
+
+        /* MODAL */
+        .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);display:none;justify-content:center;align-items:center;z-index:2000;opacity:0;transition:opacity .3s;}
+        .modal-overlay.active{display:flex;opacity:1;}
+        .modal{background:var(--card-solid);padding:1.3rem;border-radius:var(--radius);width:92%;max-width:520px;box-shadow:var(--shadow-lg);max-height:85vh;overflow-y:auto;animation:sU .3s ease;}
+
+        /* TABS */
+        .tab-nav{display:flex;gap:2px;margin-bottom:1.2rem;border-bottom:2px solid var(--border);}
+        .tab-btn{flex:1;padding:9px 3px;border:none;background:none;font-family:inherit;font-size:.72rem;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:var(--tr);}
+        .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);}.tab-btn:hover{color:var(--primary);}
+        .tab-content{display:none;}.tab-content.active{display:block;}
+
+        /* SETTINGS */
+        .setting-row{margin-bottom:1rem;}.setting-row label{display:block;margin-bottom:5px;font-weight:600;font-size:.85rem;}
+        .range-container{display:flex;align-items:center;gap:8px;}
+        input[type="range"]{flex:1;accent-color:var(--primary);height:5px;}
+        .value-display{font-weight:800;color:var(--primary);min-width:36px;text-align:right;font-size:1.05rem;}
+        .save-btn{width:100%;padding:11px;background:var(--primary);color:white;border:none;border-radius:10px;font-size:.92rem;cursor:pointer;font-weight:700;font-family:inherit;margin-top:.4rem;transition:var(--tr);}
+        .save-btn:hover{background:var(--primary-dark);}
+        .toggle-row{display:flex;justify-content:space-between;align-items:center;background:var(--bg);padding:10px;border-radius:10px;margin-bottom:10px;}
+        .toggle-switch{position:relative;width:44px;height:24px;}
+        .toggle-switch input{opacity:0;width:0;height:0;}
+        .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.4s;border-radius:34px;}
+        .slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.4s;border-radius:50%;}
+        input:checked+.slider{background-color:var(--primary);}
+        input:checked+.slider:before{transform:translateX(20px);}
+
+        /* LINK MANAGER */
+        .link-manager-list{max-height:180px;overflow-y:auto;margin-bottom:.8rem;}
+        .link-manager-item{display:flex;align-items:center;gap:7px;padding:7px 9px;background:var(--primary-light);border-radius:10px;margin-bottom:5px;border-left:4px solid var(--link-color,var(--primary));}
+        .link-manager-item .link-info{flex:1;min-width:0;}.link-manager-item .lname{font-weight:600;font-size:.82rem;}.link-manager-item .lurl{font-size:.68rem;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+        .link-manager-item .remove-link{background:none;border:none;cursor:pointer;color:var(--danger);padding:3px;border-radius:50%;flex-shrink:0;}
+        .link-manager-item .remove-link:hover{background:var(--danger-glow);}
+        .add-link-form{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:.4rem;}.add-link-form input{flex:1;min-width:70px;}
+        .color-picker{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:.6rem;}
+        .color-opt{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:var(--tr);}
+        .color-opt.selected{border-color:var(--text);transform:scale(1.2);}
+        .btn-add{padding:7px 14px;background:var(--primary);color:white;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600;font-size:.82rem;}
+        .btn-add:hover{background:var(--primary-dark);}
+
+        /* ALERT */
+        .alert-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);z-index:3000;display:none;flex-direction:column;justify-content:center;align-items:center;color:white;text-align:center;padding:2rem;}
+        .alert-overlay.active{display:flex;animation:fadeIn .3s;}
+        @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+        .bell-icon{font-size:72px;color:var(--danger);animation:ring .5s ease-in-out infinite alternate;margin-bottom:16px;}
+        @keyframes ring{from{transform:rotate(15deg);}to{transform:rotate(-15deg);}}
+        .alert-message h2{color:var(--danger);font-size:1.8rem;margin-bottom:8px;}
+        .alert-spoken-text{background:rgba(255,255,255,0.1);border-radius:16px;padding:1rem 1.2rem;margin:.8rem 0;max-width:380px;font-size:1rem;font-style:italic;border:1px solid rgba(255,255,255,0.15);line-height:1.7;}
+        .speaking-indicator{display:inline-flex;align-items:center;gap:3px;margin-bottom:.8rem;}
+        .speaking-indicator .sound-bar{width:4px;border-radius:2px;background:var(--danger);animation:sW .8s ease-in-out infinite;}
+        .speaking-indicator .sound-bar:nth-child(1){height:14px;animation-delay:0s;}.speaking-indicator .sound-bar:nth-child(2){height:22px;animation-delay:.15s;}.speaking-indicator .sound-bar:nth-child(3){height:16px;animation-delay:.3s;}.speaking-indicator .sound-bar:nth-child(4){height:26px;animation-delay:.45s;}.speaking-indicator .sound-bar:nth-child(5){height:12px;animation-delay:.6s;}
+        @keyframes sW{0%,100%{transform:scaleY(.4);opacity:.5;}50%{transform:scaleY(1);opacity:1;}}
+        .alert-actions{margin-top:1.5rem;display:flex;gap:.8rem;}
+        .btn-stop{background:var(--success);color:white;padding:11px 22px;border:none;border-radius:24px;font-weight:700;cursor:pointer;font-size:.95rem;font-family:inherit;}
+        .btn-proceed{background:transparent;border:2px solid white;color:white;padding:11px 22px;border-radius:24px;cursor:pointer;font-weight:700;font-family:inherit;}
+
+        /* TOAST */
+        .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a3632;color:white;padding:12px 24px;border-radius:12px;z-index:4000;opacity:0;transition:all .4s ease;pointer-events:none;font-size:.88rem;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,0.3);max-width:90%;text-align:center;}
+        .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+        /* LOCK SCREEN */
+        .lock-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:6000;display:none;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;padding:2rem;}
+        .lock-overlay.active{display:flex;animation:fadeIn .5s;}
+        .breathing-circle{width:150px;height:150px;border-radius:50%;background:rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:2rem;animation: breathe 6s infinite ease-in-out; border: 2px solid rgba(16,185,129,0.5);}
+        .breathing-circle span{font-size:48px; color: #fff;}
+        @keyframes breathe{0%,100%{transform:scale(1); background:rgba(16,185,129,0.2);}50%{transform:scale(1.3); background:rgba(16,185,129,0.4);}}
+        .lock-timer{font-size:2rem;font-weight:900;margin-bottom:1rem;font-family:monospace;}
+        .lock-btn{padding:12px 30px;background:var(--primary);color:white;border:none;border-radius:30px;font-size:1.1rem;font-weight:700;cursor:pointer;margin-top:20px;opacity:0.5;pointer-events:none;transition:var(--tr);}
+        .lock-btn.ready{opacity:1;pointer-events:all;}
+
+        .section-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.6rem;display:flex;align-items:center;gap:5px;}
+        .section-label .material-icons-round{font-size:15px;}
+        .empty-state{text-align:center;padding:1.2rem;color:var(--text3);font-size:.88rem;}
+        ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--text3);border-radius:3px;}
+
+        @media(max-width:600px){
+            .overall-status{flex-direction:column;text-align:center;}.call-tracking{grid-template-columns:1fr;}
+            .header-right{gap:3px;}.active-users-badge,.user-badge,.device-badge{font-size:.68rem;padding:4px 8px;}
+            .user-table{font-size:.78rem;}.user-table th,.user-table td{padding:7px 5px;}
+            main{padding:0 .5rem;}.alert-message h2{font-size:1.4rem;}.alert-spoken-text{font-size:.88rem;}
+            .tl-chat-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));}
+            header{padding:.6rem 1rem;}
+            .brand-title{font-size:1rem;}
+            .brand-tagline{display:none;}
+        }
+        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+    </style>
+</head>
+<body>
+
+<!-- ===== AUTH SCREEN ===== -->
+<div class="auth-screen" id="authScreen">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <img src="assets/images/simusalama-logo.png" alt="SimuSalama Logo" class="auth-logo-img" onerror="this.style.display='none'">
+            <h1>Simu Salama</h1>
+            <p>Simu Salama, Akili yako salama, maisha yako bora</p>
+        </div>
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="auth.switchTab('login')">Ingia</button>
+            <button class="auth-tab" onclick="auth.switchTab('signup')">Jisajili</button>
+            <button class="auth-tab" onclick="auth.switchTab('forgot')">Forgot</button>
+        </div>
+        <!-- LOGIN -->
+        <div class="auth-form active" id="loginForm">
+            <div class="form-group">
+                <label>Jina la Mtumiaji / Barua pepe</label>
+                <input type="text" class="form-input" id="loginUser" placeholder="username au email" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label>Nenosiri</label>
+                <input type="password" class="form-input" id="loginPass" placeholder="********" autocomplete="current-password">
+            </div>
+            <button class="auth-btn" onclick="auth.login()">Ingia</button>
+            <div class="auth-error" id="loginError"></div>
+            <div class="auth-hint">
+                <strong>Super Admin:</strong> nashiriwaziri29@gmail.com
+            </div>
+        </div>
+        <!-- SIGNUP -->
+        <div class="auth-form" id="signupForm">
+            <div class="form-group">
+                <label>Jina la Mtumiaji</label>
+                <input type="text" class="form-input" id="signupUser" placeholder="username" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label>Nenosiri</label>
+                <input type="password" class="form-input" id="signupPass" placeholder="********" autocomplete="new-password">
+            </div>
+            <div class="form-group">
+                <label>Thibitisha Nenosiri</label>
+                <input type="password" class="form-input" id="signupConfirm" placeholder="********" autocomplete="new-password">
+            </div>
+            <div class="form-group">
+                <label>Namba ya Simu ya Dharura</label>
+                <input type="tel" class="form-input" id="signupPhone" placeholder="+2557XXXXXXXX" autocomplete="tel">
+            </div>
+            <button class="auth-btn" onclick="auth.signup()">Jisajili</button>
+            <div class="auth-error" id="signupError"></div>
+        </div>
+        <!-- FORGOT PASSWORD -->
+        <div class="auth-form" id="forgotForm">
+            <div class="form-group">
+                <label>Jina la Mtumiaji au Barua pepe</label>
+                <input type="text" class="form-input" id="forgotUser" placeholder="username au email">
+            </div>
+            <div class="form-group">
+                <label>Nenosiri Mpya</label>
+                <input type="password" class="form-input" id="forgotNewPass" placeholder="Nenosiri mpya">
+            </div>
+            <div class="form-group">
+                <label>Thibitisha Nenosiri Mpya</label>
+                <input type="password" class="form-input" id="forgotConfirmPass" placeholder="Thibitisha nenosiri">
+            </div>
+            <button class="auth-btn" onclick="auth.resetPassword()">Badilisha Nenosiri</button>
+            <div class="auth-error" id="forgotError"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header id="appHeader" style="display:none">
+    <div class="logo">
+        <img src="assets/images/simusalama-logo.png" alt="SimuSalama Logo" class="app-logo-img" onerror="this.style.display='none'">
+        <div class="brand-info">
+            <span class="brand-title">Simu Salama</span>
+            <span class="brand-tagline">Akili yako salama, maisha yako bora</span>
+        </div>
+    </div>
+    <div class="header-right">
+        <div class="device-badge" id="deviceBadge" title="Kifaa kinachotumika">
+            <span class="material-icons-round" style="font-size:14px">devices</span>
+            <span id="deviceBadgeText">-</span>
+        </div>
+        <div class="active-users-badge" title="Watumiaji Walio Online">
+            <span class="active-dot"></span>
+            <span id="activeUsersCount">1</span>
+        </div>
+        <div class="user-badge">
+            <span class="material-icons-round" style="font-size:15px">person</span>
+            <span id="headerUsername">-</span>
+            <span class="role-badge" id="headerRole">user</span>
+        </div>
+        <button class="hdr-btn" id="openAdminPanel" style="display:none" title="Admin Panel" onclick="app.toggleAdminPanel()">
+            <span class="material-icons-round">admin_panel_settings</span>
+        </button>
+        <button class="hdr-btn" id="openSettings" title="Settings" onclick="app.openSettings()">
+            <span class="material-icons-round">settings</span>
+        </button>
+        <button class="hdr-btn" title="Logout" onclick="auth.logout()">
+            <span class="material-icons-round">logout</span>
+        </button>
+    </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main id="appMain" style="display:none">
+
+    <!-- Overall Status -->
+    <div class="overall-status" id="overallStatus">
+        <span class="material-icons-round big-icon" id="overallIcon">verified_user</span>
+        <div class="status-info">
+            <h2 id="overallTitle"> Hali yako ya kisaikolojia iko katika kiwango kizuri</h2>
+            <p id="overallDesc">Matumizi yako ya kidijitali yako katika kiwango cha salama.</p>
+            <!-- Stress Meter -->
+            <div class="stress-meter-container">
+                <div class="stress-fill" id="stressFill"></div>
+            </div>
+            <div class="stress-label" id="stressLabel">Stress Level: 0%</div>
+        </div>
+        <div class="overall-tl" id="overallTl">
+            <div class="tl-circle" id="tlCGreen"></div>
+            <div class="tl-circle" id="tlCYellow"></div>
+            <div class="tl-circle" id="tlCRed"></div>
+        </div>
+    </div>
+
+    <!-- Psychological Self-Assessment -->
+    <section class="card">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title"> Pima Afya Yako ya Kisaikolojia - Uko Katika Kundi Gani?</h2>
+                <div class="card-subtitle">Athari za kisaikolojia kulingana na kiwango cha matumizi yako</div>
+            </div>
+            <span class="material-icons-round" style="color:var(--primary);font-size:28px">psychology</span>
+        </div>
+        <div id="psychAssessment"></div>
+    </section>
+
+    <!-- Health Tools Section (Added) -->
+    <section class="card">
+        <div class="card-header">
+            <div><h2 class="card-title">Zana za Afya ya Akili</h2><div class="card-subtitle">Mazoezi na Vifaa</div></div>
+            <div style="display:flex;align-items:center;gap:7px"><span class="material-icons-round" style="color:var(--success)">spa</span></div>
+        </div>
+        <div class="links-grid">
+            <a href="breathing-exercise.html" class="link-btn" style="--link-color:var(--primary)">
+                <span class="material-icons-round" style="color:var(--primary)">air</span>
+                <span>Mazoezi ya Kupumua</span>
+            </a>
+            <a href="mental-health-tool.html" class="link-btn" style="--link-color:var(--accent)">
+                <span class="material-icons-round" style="color:var(--accent)">psychology</span>
+                <span>Kipima Akili</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Mfumo wa Taa za Tahadhari Muhtasari wa Matumizi ya Mawasiliano -->
+    <section class="card">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">Mfumo wa Taa za Tahadhari - Muhtasari wa Matumizi ya Mawasiliano</h2>
+                <div class="card-subtitle">Hali ya kila chat/unukuzi kwa urefu wa taa</div>
+            </div>
+            <span class="material-icons-round" style="color:var(--primary)">traffic</span>
+        </div>
+        <div class="tl-chat-grid" id="tlChatGrid"></div>
+    </section>
+
+    <!-- Announcements -->
+    <section class="card" id="announcementsSection">
+        <div class="card-header">
+            <h2 class="card-title">Matangazo</h2>
+            <span class="material-icons-round" style="color:var(--accent)">campaign</span>
+        </div>
+        <div id="announcementsList"></div>
+    </section>
+
+    <!-- Call Tracking -->
+    <section class="card">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">Ufuatiliaji wa Simu</h2>
+                <div class="card-subtitle">Simu zilizopigwa na kupokelewa leo</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px">
+                <div id="callTrafficLight"></div>
+                <span class="material-icons-round" style="color:var(--primary)">phone_in_talk</span>
+            </div>
+        </div>
+        <div class="phone-display" id="phoneDisplay">
+            <span class="material-icons-round">sim_card</span>
+            <span id="phoneNumText">Hakuna Namba</span>
+        </div>
+        <div id="unregisteredWarning" style="display:none" class="reg-warning">
+            <span class="material-icons-round">block</span>
+            <span>Namba hii <strong>haijasajiliwa</strong>. Simu haziwezi kupigwa. Sajili kwanza kwenye Mipangilio.</span>
+        </div>
+        <div class="call-tracking">
+            <div class="call-stat made"><span class="material-icons-round">call_made</span><div class="stat-num" id="callsMade">0</div><div class="stat-label">Zilizopigwa</div></div>
+            <div class="call-stat received"><span class="material-icons-round">call_received</span><div class="stat-num" id="callsReceived">0</div><div class="stat-label">Zilizopokelewa</div></div>
+        </div>
+        <div class="call-actions">
+            <a href="#" class="btn-call primary" id="btnMakeCall" onclick="app.makeCall(event)"><span class="material-icons-round">phone</span><span>Piga Simu</span></a>
+            <button class="btn-call secondary" id="btnLogReceived" onclick="app.logReceived()"><span class="material-icons-round">phone_missed</span><span>Rudia Simu</span></button>
+            <button class="btn-call danger" onclick="app.resetCallCounters()"><span class="material-icons-round">restart_alt</span><span>Reseti</span></button>
+        </div>
+    </section>
+
+    <!-- Mood -->
+    <section class="card">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">Unajisikia Vipi Leo?</h2>
+                <div class="card-subtitle">Chagua hali yako ya kihisia</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px"><div id="moodTrafficLight"></div><span class="material-icons-round" style="color:var(--primary)">sentiment_satisfied_alt</span></div>
+        </div>
+        <div class="mood-selector" id="moodSelector">
+            <button class="mood-btn" data-mood="stressed" title="Stressed">😫</button>
+            <button class="mood-btn" data-mood="anxious" title="Anxious">😰</button>
+            <button class="mood-btn" data-mood="neutral" title="Neutral">😐</button>
+            <button class="mood-btn" data-mood="good" title="Good">🙂</button>
+            <button class="mood-btn" data-mood="great" title="Great">🤩</button>
+        </div>
+        <p id="moodFeedback" style="margin-top:.8rem;text-align:center;color:var(--text2);font-style:italic;font-size:.88rem">Chagua emoji kurekodi hali yako.</p>
+    </section>
+
+    <!-- Social Links -->
+    <section class="card">
+        <div class="card-header">
+            <div><h2 class="card-title">Chat - Tuma Ujumbe</h2><div class="card-subtitle">Mitandao ya kijamii</div></div>
+            <div style="display:flex;align-items:center;gap:7px"><div id="socialTrafficLight"></div><span class="material-icons-round" style="color:#25d366">chat</span></div>
+        </div>
+        <div class="links-grid" id="socialLinksGrid"></div>
+    </section>
+
+    <!-- News Links -->
+    <section class="card">
+        <div class="card-header">
+            <div><h2 class="card-title">Article - Vyanzo vya Habari</h2><div class="card-subtitle">Vyanzo vya habari</div></div>
+            <div style="display:flex;align-items:center;gap:7px"><div id="newsTrafficLight"></div><span class="material-icons-round" style="color:#f4511e">article</span></div>
+        </div>
+        <div class="links-grid" id="newsLinksGrid"></div>
+    </section>
+
+    <!-- Usage Chart -->
+    <section class="card">
+        <div class="card-header">
+            <div><h2 class="card-title">Dashibodi ya Matumizi</h2><div class="card-subtitle">Muhtasari wa leo</div></div>
+            <div style="font-size:.88rem;color:var(--text2);font-weight:700">Leo: <span id="totalTime">0</span> dak</div>
+        </div>
+        <div class="chart-container" id="chartContainer">
+            <div class="bar-group"><div class="bar green-bar" id="bar-social" style="height:0%" data-val="0"></div><span class="bar-label">Mtandao</span></div>
+            <div class="bar-group"><div class="bar green-bar" id="bar-chat" style="height:0%" data-val="0"></div><span class="bar-label">Ujumbe</span></div>
+            <div class="bar-group"><div class="bar green-bar" id="bar-call" style="height:0%" data-val="0"></div><span class="bar-label">Simu</span></div>
+            <div class="bar-group"><div class="bar green-bar" id="bar-news" style="height:0%" data-val="0"></div><span class="bar-label">Habari</span></div>
+        </div>
+        <div style="display:flex;gap:14px;margin-top:10px;flex-wrap:wrap;justify-content:center">
+            <div style="display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--text3)"><span style="width:11px;height:11px;border-radius:3px;background:linear-gradient(to top,#059669,#10B981);display:inline-block"></span>Salama</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--text3)"><span style="width:11px;height:11px;border-radius:3px;background:linear-gradient(to top,#D97706,#F59E0B);display:inline-block"></span>Tahadhari</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--text3)"><span style="width:11px;height:11px;border-radius:3px;background:linear-gradient(to top,#DC2626,#EF4444);display:inline-block"></span>Hatari</div>
+        </div>
+    </section>
+
+    <!-- GOVERN LINK - Mfumo wa Mzazi -->
+    <section class="govern-section" id="governSection">
+        <div class="card-header" style="margin-bottom:1rem">
+            <div>
+                <h2 class="card-title" style="color:var(--accent)">
+                    <span class="material-icons-round" style="vertical-align:middle;margin-right:5px">family_restroom</span>
+                    Govern Link - Ufuatiliaji wa Mzazi
+                </h2>
+                <div class="card-subtitle">Mzazi anaweza kufuatilia simu ya mtoto/mgonjwa</div>
+            </div>
+        </div>
+        <div id="governContent"></div>
+    </section>
+
+    <!-- CHEAT DETECTION -->
+    <section class="cheat-section" id="cheatSection">
+        <div class="card-header" style="margin-bottom:1rem">
+            <div>
+                <h2 class="card-title" style="color:var(--danger)">
+                    <span class="material-icons-round" style="vertical-align:middle;margin-right:5px">shield</span>
+                    udanganyifu / jaribio la kuvunja mfumo
+                </h2>
+                <div class="card-subtitle">Mfumo unagundua jaribu la kudhuru au kuondoa programu</div>
+            </div>
+        </div>
+        <div id="cheatContent"></div>
+    </section>
+
+    <!-- ADMIN PANEL -->
+    <div class="admin-panel" id="adminPanel">
+        <section class="card">
+            <div class="card-header">
+                <h2 class="card-title" style="color:var(--primary)"><span class="material-icons-round" style="vertical-align:middle;margin-right:5px">shield</span>Paneli ya Msimamizi</h2>
+                <span class="role-badge" id="adminPanelRole">admin</span>
+            </div>
+            
+            <div class="admin-section" id="annManagement">
+                <h3><span class="material-icons-round" style="color:var(--accent)">campaign</span>Simamia Matangazo</h3>
+                <div class="ann-form">
+                    <div class="form-group"><label>Kichwa</label><input type="text" class="form-input" id="annTitleInput" placeholder="Kichwa cha tangazo..."></div>
+                    <div class="form-group"><label>Maudhui</label><textarea id="annContentInput" placeholder="Andika maudhui..."></textarea></div>
+                    <div class="form-group"><label>Picha</label><div class="file-upload"><label for="annImageInput"><span class="material-icons-round" style="font-size:16px">image</span>Chagua</label><input type="file" id="annImageInput" accept="image/*" onchange="app.handleImageUpload(event)"><span class="file-name" id="annFileName">Hakuna</span></div><div class="img-preview" id="annImgPreview" style="display:none"><img id="annImgPreviewSrc" src="" alt="Preview"><button class="remove-img" onclick="app.removeImage()">&times;</button></div></div>
+                    
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-submit" id="btnSubmitAnn" onclick="app.createAnnouncement()" style="flex:1"><span class="material-icons-round" style="font-size:16px;vertical-align:middle;margin-right:3px">add_circle</span>Post Tangazo</button>
+                        <button class="btn-cancel-edit" id="btnCancelEditAnn" onclick="app.cancelEditAnnouncement()" style="flex:1"><span class="material-icons-round" style="font-size:16px;vertical-align:middle;margin-right:3px">cancel</span>Ghairi</button>
+                    </div>
+                </div>
+                <div id="adminAnnList"></div>
+            </div>
+
+            <div class="admin-section" id="userManagement">
+                <h3><span class="material-icons-round" style="color:var(--primary)">people</span>Simamia Watumiaji na Vifaa</h3>
+                <div style="overflow-x:auto"><table class="user-table" id="userTable"><thead><tr><th>Mtumiaji</th><th>Jukumu</th><th>Vifaa</th><th>Namba</th><th>Vitendo</th></tr></thead><tbody id="userTableBody"></tbody></table></div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- ===== SETTINGS MODAL ===== -->
+<div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+        <div class="modal-header"><h2>Mipangilio</h2><button class="close-modal" onclick="app.closeSettings()" style="background:none;border:none;font-size:26px;cursor:pointer;color:var(--text2)">&times;</button></div>
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="limits" onclick="app.switchTab('limits')">Vipimo</button>
+            <button class="tab-btn" data-tab="phone" onclick="app.switchTab('phone')">Simu</button>
+            <button class="tab-btn" data-tab="social" onclick="app.switchTab('social')">Mitandao</button>
+            <button class="tab-btn" data-tab="news" onclick="app.switchTab('news')">Habari</button>
+        </div>
+        <div class="tab-content active" id="tab-limits">
+            <div class="setting-row"><label>Mitandao (dakika)</label><div class="range-container"><input type="range" id="limit-social" min="5" max="120" value="30"><span class="value-display" id="val-social">30</span></div></div>
+            <div class="setting-row"><label>Ujumbe (idadi)</label><div class="range-container"><input type="range" id="limit-chat" min="5" max="50" value="20"><span class="value-display" id="val-chat">20</span></div></div>
+            <!-- LOWERED DEFAULT LIMITS FOR MENTAL HEALTH SAFETY -->
+            <div class="setting-row"><label>Simu (idadi) - Salama</label><div class="range-container"><input type="range" id="limit-call" min="1" max="20" value="3"><span class="value-display" id="val-call">3</span></div></div>
+            <div class="setting-row"><label>Simu Zinazoingia (Kupokelewa) - Salama</label><div class="range-container"><input type="range" id="limit-incoming" min="1" max="20" value="2"><span class="value-display" id="val-incoming">2</span></div></div>
+            <div class="setting-row"><label>Habari (idadi)</label><div class="range-container"><input type="range" id="limit-news" min="3" max="30" value="10"><span class="value-display" id="val-news">10</span></div></div>
+            
+            <!-- NEW: Auto Reply Settings -->
+            <div class="setting-row" style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--border);">
+                <label style="color:var(--primary); font-weight:700;">Ujumbe wa Auto-Reply (SMS)</label>
+                <input type="text" class="form-input" id="autoReplyMsg" placeholder="Samahani, nitakupigia baadaye...">
+            </div>
+            
+            <button class="save-btn" onclick="app.saveLimits()">Hifadhi Mipaka</button>
+        </div>
+        <div class="tab-content" id="tab-phone">
+            <div class="reg-numbers-section">
+                <h4><span class="material-icons-round" style="font-size:16px;color:var(--primary)">verified_user</span>Namba Zilizosajiliwa</h4>
+                <div class="reg-warning" style="margin-bottom:.6rem"><span class="material-icons-round">info</span><span>Namba isiyosajiliwa <strong>haitaweza kupiga au kupokea simu</strong>.</span></div>
+                <div class="reg-num-list" id="regNumbersList"></div>
+                <div class="reg-add-row"><input type="tel" class="form-input" id="inputRegisterNumber" placeholder="+2557XXXXXXXX"><button class="btn-add" onclick="app.registerNumber()"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">person_add</span>Sajili</button></div>
+            </div>
+            
+            <!-- NEW: Simulation Settings -->
+            <div class="toggle-row">
+                <span style="font-size:.85rem; font-weight:600;">Simulia Simu kutoka kwa "Unknown"</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="simulateUnknown">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-row"><label>Namba ya Sasa</label><input type="tel" class="form-input" id="inputPhoneNumber" placeholder="Chagua kutoka orodha"></div>
+            <div style="background:var(--primary-light);padding:.8rem;border-radius:12px;margin-bottom:.8rem"><div style="font-size:.82rem;color:var(--text3);margin-bottom:3px">Namba ya sasa:</div><div style="font-size:1.1rem;font-weight:800;color:var(--primary)" id="currentPhoneDisplay">-</div><div id="regStatusBadge" style="margin-top:5px;font-size:.75rem;font-weight:600"></div></div>
+            <button class="save-btn" onclick="app.savePhone()">Hifadhi Namba</button>
+        </div>
+        <div class="tab-content" id="tab-social">
+            <div class="section-label"><span class="material-icons-round">link</span>Viungo vya Mitandao</div>
+            <div class="link-manager-list" id="socialLinksList"></div>
+            <div class="section-label" style="margin-top:.4rem"><span class="material-icons-round">add_circle</span>Ongeza</div>
+            <div class="add-link-form"><input type="text" class="form-input" id="newSocialName" placeholder="Jina"><input type="url" class="form-input" id="newSocialUrl" placeholder="https://..."></div>
+            <div class="color-picker" id="socialColorPicker"></div>
+            <button class="btn-add" onclick="app.addLink('social')">Ongeza Kiungo</button>
+        </div>
+        <div class="tab-content" id="tab-news">
+            <div class="section-label"><span class="material-icons-round">link</span>Viungo vya Habari</div>
+            <div class="link-manager-list" id="newsLinksList"></div>
+            <div class="section-label" style="margin-top:.4rem"><span class="material-icons-round">add_circle</span>Ongeza</div>
+            <div class="add-link-form"><input type="text" class="form-input" id="newNewsName" placeholder="Jina"><input type="url" class="form-input" id="newNewsUrl" placeholder="https://..."></div>
+            <div class="color-picker" id="newsColorPicker"></div>
+            <button class="btn-add" onclick="app.addLink('news')">Ongeza Kiungo</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== ALERT ===== -->
+<div class="alert-overlay" id="alertModal">
+    <span class="material-icons-round bell-icon">notifications_active</span>
+    <div class="alert-message"><h2>Zaidi ya Kiwango!</h2><p id="alertMessage">Umevuka kikwacho.</p></div>
+    <div class="speaking-indicator" id="speakingIndicator" style="display:none"><div class="sound-bar"></div><div class="sound-bar"></div><div class="sound-bar"></div><div class="sound-bar"></div><div class="sound-bar"></div></div>
+    <div class="alert-spoken-text" id="alertSpokenText">"Afya yako ni muhimu kwetu, tafadhali pumzika kisha utarudi baadae"</div>
+    <div class="alert-actions"><button class="btn-stop" onclick="app.handleAlertResponse(false)">Acha Sasa</button><button class="btn-proceed" onclick="app.handleAlertResponse(true)">Endelea</button></div>
+</div>
+
+<!-- ===== LOCK SCREEN (Phone Overwhelmed) ===== -->
+<div class="lock-overlay" id="lockOverlay">
+    <div class="breathing-circle">
+        <span class="material-icons-round">self_improvement</span>
+    </div>
+    <h2>Unahitaji Mapumziko</h2>
+    <p style="color:#ddd; margin-bottom:20px;">Unapumua sana. Fanya mazoezi ya kupumua kufungua simu.</p>
+    <div class="lock-timer" id="lockTimer">00:30</div>
+    <button class="lock-btn" id="lockBtn" onclick="app.unlockPhone()">Fungua Sasa</button>
+</div>
+
+<!-- ===== CHEAT ALERT ===== -->
+<div class="alert-overlay" id="cheatAlertModal">
+    <span class="material-icons-round bell-icon" style="color:#FF6B00;animation:ring .3s ease-in-out infinite alternate">warning</span>
+    <div class="alert-message"><h2 style="color:#FF6B00">Cheat ya Mfumo Imenaswa!</h2><p id="cheatAlertMsg">Jaribu la kudhuru mfumo limegundulika.</p></div>
+    <div class="cheat-sms" style="margin:1rem 0;max-width:380px">
+        <span class="material-icons-round">sms</span>
+        <div>
+            <div style="font-size:.7rem;opacity:.8;margin-bottom:2px">UJUMBE UNATUMWA KWA:</div>
+            <div id="cheatSmsNumber" style="font-size:1rem">+2557XXXXXXXX</div>
+            <div style="font-size:.75rem;margin-top:4px;font-weight:800">"Cheat ya Mfumo Imenaswa"</div>
+        </div>
+    </div>
+    <div class="alert-actions"><button class="btn-stop" onclick="app.closeCheatAlert()">Nimeelewa</button></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================================================
+   GUNDUZI LA KIFAA - Installation Auto-Detection
+   =================================================== */
+const DeviceDetect = {
+    getDeviceId() {
+        let id = localStorage.getItem('fh_device_id');
+        if (!id) {
+            id = 'DEV_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+            localStorage.setItem('fh_device_id', id);
+        }
+        return id;
+    },
+    getDeviceInfo() {
+        const ua = navigator.userAgent;
+        let type = 'Desktop';
+        if (/iPhone/i.test(ua)) type = 'iPhone';
+        else if (/iPad/i.test(ua)) type = 'iPad';
+        else if (/Android.*Mobile/i.test(ua)) type = 'Simu ya Android';
+        else if (/Android/i.test(ua)) type = 'Tablet ya Android';
+        else if (/Mobile/i.test(ua)) type = 'Simu';
+        return { id: this.getDeviceId(), type, userAgent: ua.substring(0, 60), firstSeen: new Date().toISOString(), lastSeen: new Date().toISOString() };
+    },
+    registerDevice(userId) {
+        if (!userId) return;
+        const info = this.getDeviceInfo();
+        const key = 'fh_devices';
+        let devices = [];
+        try { devices = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { devices = []; }
+        const existing = devices.find(d => d.deviceId === info.id && d.userId === userId);
+        if (existing) {
+            existing.lastSeen = info.lastSeen;
+            existing.type = info.type;
+        } else {
+            devices.push({ deviceId: info.id, userId, type: info.type, userAgent: info.userAgent, firstSeen: info.firstSeen, lastSeen: info.lastSeen });
+        }
+        localStorage.setItem(key, JSON.stringify(devices));
+        return info;
+    },
+    getUserDevices(userId) {
+        let devices = [];
+        try { devices = JSON.parse(localStorage.getItem('fh_devices') || '[]'); } catch(e) {}
+        return devices.filter(d => d.userId === userId);
+    },
+    getAllDevices() {
+        let devices = [];
+        try { devices = JSON.parse(localStorage.getItem('fh_devices') || '[]'); } catch(e) {}
+        return devices;
+    }
+};
+
+/* ===================================================
+   CHEAT DETECTION SYSTEM
+   =================================================== */
+const CheatDetect = {
+    logs: [],
+    isActive: false,
+    blurCount: 0,
+    visibilityHiddenCount: 0,
+    lastBlurTime: null,
+
+    init() {
+        this.loadLogs();
+        this.isActive = true;
+        document.addEventListener('visibilitychange', () => this.onVisibilityChange());
+        window.addEventListener('blur', () => this.onBlur());
+        window.addEventListener('focus', () => this.onFocus());
+        document.addEventListener('contextmenu', e => { e.preventDefault(); this.log('ALERT', 'Jaribu la kuangalia menyu ya kulia (context menu)'); });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault();
+                this.log('ALERT', 'Jaribu la kufungua Developer Tools (F12/Ctrl+Shift+I)');
+            }
+        });
+        window.addEventListener('beforeunload', () => {
+            if (this.isActive) localStorage.setItem('fh_cheat_lastActive', new Date().toISOString());
+        });
+    },
+
+    onVisibilityChange() {
+        if (!this.isActive) return;
+        if (document.hidden) {
+            this.visibilityHiddenCount++;
+            this.lastBlurTime = Date.now();
+            this.log('WARN', 'Ukurasa umefichwa - mtumiaji anaweza kuwacha programu');
+            if (app && app.isInDangerZone()) this.triggerCheatAlert('Ukurasa umefichwa wakati kiwango ni nyekundu');
+        } else {
+            const away = Date.now() - (this.lastBlurTime || Date.now());
+            if (away > 5000) this.log('INFO', 'Ukurasa umerudishwa baada ya ' + Math.round(away/1000) + ' sekunde');
+        }
+    },
+
+    onBlur() {
+        if (!this.isActive) return;
+        this.blurCount++;
+        this.lastBlurTime = Date.now();
+    },
+
+    onFocus() {
+        if (!this.isActive) return;
+        const away = Date.now() - (this.lastBlurTime || Date.now());
+        if (away > 3000) {
+            this.log('WARN', 'Mtumiaji alitoka kwenye programu kwa ' + Math.round(away/1000) + ' sekunde');
+            if (app && app.isInDangerZone()) this.triggerCheatAlert('Mtumiaji alitoka kwa ' + Math.round(away/1000) + 's wakati kiwango ni nyekundu');
+        }
+    },
+
+    log(level, message) {
+        const entry = { time: new Date().toLocaleString('sw-TZ'), level, message, deviceId: DeviceDetect.getDeviceId() };
+        this.logs.unshift(entry);
+        if (this.logs.length > 50) this.logs = this.logs.slice(0, 50);
+        this.saveLogs();
+        this.sendCheatNotification(entry);
+    },
+
+    triggerCheatAlert(reason) {
+        this.log('CRITICAL', 'CHEAT YAMENASWA: ' + reason);
+        const modal = document.getElementById('cheatAlertModal');
+        document.getElementById('cheatAlertMsg').textContent = reason;
+        let phone = '+2557XXXXXXXX';
+        if (auth && auth.currentUser) {
+            try {
+                const regNums = JSON.parse(localStorage.getItem('fh_registeredNumbers_' + auth.currentUser.id) || '[]');
+                if (regNums.length > 0) phone = regNums[0];
+            } catch(e) {}
+            const governData = JSON.parse(localStorage.getItem('fh_govern_links') || '{}');
+            const myLink = Object.values(governData).find(g => g.childId === auth.currentUser.id);
+            if (myLink && myLink.parentPhone) phone = myLink.parentPhone;
+        }
+        document.getElementById('cheatSmsNumber').textContent = phone;
+        modal.classList.add('active');
+        this.sendBrowserNotification('Cheat ya Mfumo Imenaswa', reason + '. Ujumbe umetumwa kwa ' + phone);
+    },
+
+    sendBrowserNotification(title, body) {
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification(title, { body, icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🚨</text></svg>' });
+        }
+    },
+
+    sendCheatNotification(entry) {
+        if (!auth || !auth.currentUser) return;
+        try {
+            const governData = JSON.parse(localStorage.getItem('fh_govern_links') || '{}');
+            Object.values(governData).forEach(g => {
+                if (g.childId === auth.currentUser.id) {
+                    if (!g.cheatLogs) g.cheatLogs = [];
+                    g.cheatLogs.unshift(entry);
+                    if (g.cheatLogs.length > 30) g.cheatLogs = g.cheatLogs.slice(0, 30);
+                    g.lastCheatTime = entry.time;
+                }
+            });
+            localStorage.setItem('fh_govern_links', JSON.stringify(governData));
+        } catch(e) {}
+    },
+
+    loadLogs() { try { this.logs = JSON.parse(localStorage.getItem('fh_cheat_logs') || '[]'); } catch(e) { this.logs = []; } },
+    saveLogs() { localStorage.setItem('fh_cheat_logs', JSON.stringify(this.logs)); },
+    getLogs() { return this.logs; },
+    clearLogs() { this.logs = []; this.saveLogs(); }
+};
+
+/* ===================================================
+   AUTH - Ingia, Jisajili, Forgot Password
+   =================================================== */
+const auth = {
+    currentUser: null,
+    users: [],
+    defaultUsers: [
+        { id: 'sa_root', username: 'nashiriwaziri29@gmail.com', password: 'WAZIRI2015', role: 'super_admin', createdAt: '2025-01-01', online: false, emergencyPhone: '' }
+    ],
+
+    init() {
+        this.loadUsers();
+        const session = localStorage.getItem('fh_session');
+        if (session) {
+            const user = this.users.find(u => u.id === session);
+            if (user) { this.currentUser = user; user.online = true; this.saveUsers(); this.showApp(); return; }
+        }
+        this.showAuth();
+        if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+    },
+
+    loadUsers() {
+        try {
+            const d = localStorage.getItem('fh_users');
+            if (d) { this.users = JSON.parse(d); if (!this.users.find(u => u.role === 'super_admin')) { this.users.push(...this.defaultUsers); this.saveUsers(); } }
+            else { this.users = JSON.parse(JSON.stringify(this.defaultUsers)); this.saveUsers(); }
+        } catch(e) { this.users = JSON.parse(JSON.stringify(this.defaultUsers)); this.saveUsers(); }
+    },
+    saveUsers() { localStorage.setItem('fh_users', JSON.stringify(this.users)); },
+
+    switchTab(tab) {
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+        const tabs = document.querySelectorAll('.auth-tab');
+        const forms = [document.getElementById('loginForm'), document.getElementById('signupForm'), document.getElementById('forgotForm')];
+        const idx = tab === 'login' ? 0 : tab === 'signup' ? 1 : 2;
+        tabs[idx].classList.add('active');
+        forms[idx].classList.add('active');
+        document.getElementById('loginError').textContent = '';
+        document.getElementById('signupError').textContent = '';
+        document.getElementById('forgotError').textContent = '';
+    },
+
+    login() {
+        const username = document.getElementById('loginUser').value.trim().toLowerCase();
+        const password = document.getElementById('loginPass').value;
+        const err = document.getElementById('loginError');
+        if (!username || !password) { err.textContent = 'Jaza sehemu zote.'; return; }
+        const user = this.users.find(u => u.username.toLowerCase() === username && u.password === password);
+        if (!user) { err.textContent = 'Jina au nenosiri sio sahihi.'; return; }
+        this.currentUser = user; user.online = true; this.saveUsers();
+        localStorage.setItem('fh_session', user.id);
+        DeviceDetect.registerDevice(user.id);
+        this.showApp();
+        app.showToast('Karibu, ' + user.username.split('@')[0] + '!');
+    },
+
+    signup() {
+        const username = document.getElementById('signupUser').value.trim().toLowerCase();
+        const password = document.getElementById('signupPass').value;
+        const confirm = document.getElementById('signupConfirm').value;
+        const phone = document.getElementById('signupPhone').value.trim();
+        const err = document.getElementById('signupError');
+        if (!username || !password || !confirm) { err.textContent = 'Jaza sehemu zote muhimu.'; return; }
+        if (username.length < 3) { err.textContent = 'Jina lazima liwe angalau herufi 3.'; return; }
+        if (password.length < 4) { err.textContent = 'Nenosiri lazima liwe angalau herufi 4.'; return; }
+        if (password !== confirm) { err.textContent = 'Nenosiri hazilingani.'; return; }
+        if (this.users.find(u => u.username.toLowerCase() === username)) { err.textContent = 'Jina limetumika tayari.'; return; }
+        const newUser = { id: 'u_' + Date.now(), username, password, role: 'user', createdAt: new Date().toISOString().split('T')[0], online: true, emergencyPhone: phone };
+        this.users.push(newUser);
+        this.currentUser = newUser; this.saveUsers();
+        localStorage.setItem('fh_session', newUser.id);
+        DeviceDetect.registerDevice(newUser.id);
+        if (phone) {
+            const uid = newUser.id;
+            let nums = []; try { nums = JSON.parse(localStorage.getItem('fh_registeredNumbers_' + uid) || '[]'); } catch(e) {}
+            if (!nums.includes(phone)) { nums.push(phone); localStorage.setItem('fh_registeredNumbers_' + uid, JSON.stringify(nums)); }
+        }
+        this.showApp();
+        app.showToast('Usajili umefanikiwa! Karibu!');
+    },
+
+    resetPassword() {
+        const username = document.getElementById('forgotUser').value.trim().toLowerCase();
+        const newPass = document.getElementById('forgotNewPass').value;
+        const confirmPass = document.getElementById('forgotConfirmPass').value;
+        const err = document.getElementById('forgotError');
+        if (!username || !newPass || !confirmPass) { err.textContent = 'Jaza sehemu zote.'; return; }
+        if (newPass.length < 4) { err.textContent = 'Nenosiri lazima liwe angalau herufi 4.'; return; }
+        if (newPass !== confirmPass) { err.textContent = 'Nenosiri hazilingani.'; return; }
+        const user = this.users.find(u => u.username.toLowerCase() === username);
+        if (!user) { err.textContent = 'Akaunti haipatikani.'; return; }
+        user.password = newPass;
+        this.saveUsers();
+        err.textContent = '';
+        app.showToast('Nenosiri limebadilishwa kwa mafanikio!');
+        this.switchTab('login');
+        document.getElementById('forgotUser').value = '';
+        document.getElementById('forgotNewPass').value = '';
+        document.getElementById('forgotConfirmPass').value = '';
+    },
+
+    logout() {
+        if (this.currentUser) { this.currentUser.online = false; this.saveUsers(); }
+        this.currentUser = null;
+        localStorage.removeItem('fh_session');
+        document.getElementById('appHeader').style.display = 'none';
+        document.getElementById('appMain').style.display = 'none';
+        document.getElementById('authScreen').classList.remove('hidden');
+        document.getElementById('loginUser').value = '';
+        document.getElementById('loginPass').value = '';
+        document.getElementById('loginError').textContent = '';
+        CheatDetect.isActive = false;
+        if ('speechSynthesis' in window) speechSynthesis.cancel();
+        this.switchTab('login');
+    },
+
+    showAuth() { document.getElementById('authScreen').classList.remove('hidden'); document.getElementById('appHeader').style.display = 'none'; document.getElementById('appMain').style.display = 'none'; },
+
+    showApp() {
+        document.getElementById('authScreen').classList.add('hidden');
+        document.getElementById('appHeader').style.display = 'flex';
+        document.getElementById('appMain').style.display = 'flex';
+        const displayName = this.currentUser.username.includes('@') ? this.currentUser.username.split('@')[0] : this.currentUser.username;
+        document.getElementById('headerUsername').textContent = displayName;
+        const rEl = document.getElementById('headerRole');
+        rEl.textContent = this.currentUser.role === 'super_admin' ? 'SUPER ADMIN' : this.currentUser.role.toUpperCase();
+        rEl.className = 'role-badge ' + this.currentUser.role;
+        document.getElementById('openAdminPanel').style.display = (this.currentUser.role === 'admin' || this.currentUser.role === 'super_admin') ? 'flex' : 'none';
+        const devInfo = DeviceDetect.registerDevice(this.currentUser.id);
+        document.getElementById('deviceBadgeText').textContent = devInfo.type.substring(0, 10);
+        CheatDetect.init();
+        app.init();
+    },
+
+    getOnlineCount() { return this.users.filter(u => u.online).length; }
+};
+
+/* ===================================================
+   PSYCHOLOGY - Athari za Kisaikolojia
+   =================================================== */
+const Psychology = {
+    levels: {
+        green: {
+            name: 'Kiwango cha Kijani - Salama',
+            badge: 'KUNDI LA 1',
+            badgeClass: 'lb-green',
+            dotClass: 'g',
+            cardClass: 'level-green',
+            symptoms: ['Unajisikia furaha na utulivu baada ya kutumia simu yako', 'Unaweza kuacha simu wakati wowote bila kuhisi wasiwasi au hamaki', 'Usingizi wako ni wa kawaida - unalala vizuri na kwa wakati', 'Unajihusisha na shughuli za kimwili kama mazoezi, kutembea, au michezo', 'Unatabasamu na kuzungumza na watu ana kwa ana bila matatizo', 'Unaweza kusoma kitabu au kufanya kazi bila kuhusi kutoka kwenye simu', 'Akili yako iko safi, unaweza kufanya maamuzi sahihi kwa urahisi', 'Uhusiano wako na familia na marafiki unaoendelea vizuri'],
+            conclusion: 'Uko katika hali nzuri. Matumizi yako ya kidijitali hayakuathiri afya yako ya kisaikolojia. Endelea hivyo hivyo!'
+        },
+        yellow: {
+            name: 'Kiwango cha Njano - Tahadhari',
+            badge: 'KUNDI LA 2',
+            badgeClass: 'lb-yellow',
+            dotClass: 'y',
+            cardClass: 'level-yellow',
+            symptoms: ['Mara kwa mara unakosa wakati bila kujua ulipoishia - dakika zinapita bila kujua', 'Unahisi wasiwasi mkubwa ukikosa simu yako hata kwa dakika chache', 'Unapenda kuangalia simu mara kwa mara hata hakuna ujumbe wala arifa', 'Usingizi unaoanza kuwa tatizo - unalala sana au kidogo sana', 'Unapoteza riba katika shughuli za kawaida kazi au masomo', 'Mwili wako unaanza kuumwa shingo, mgongo, na kiganja kutokana na kushika simu', 'Macho yako yanaweza kuwa mekundu, yanachoka, na kuwa na machozi ya kawaida / kuwashwa macho', 'Unazungumza kidogo sana na watu karibu wako - unapenda kutumia simu zaidi'],
+            conclusion: 'Uko katika kiwango cha tahadhari. Matumizi yako yanaanza kuathiri afya yako. Punguza muda wa skrini na pata msaada ikiwa inahitajika.'
+        },
+        red: {
+            name: 'Kiwango cha Nyekundu - Hatari',
+            badge: 'KUNDI LA 3',
+            badgeClass: 'lb-red',
+            dotClass: 'r',
+            cardClass: 'level-red',
+            symptoms: ['Unasikia maumivu makali ya kichwa na macho kutokana na kuangalia skrini sana', 'Umekuwa na Uzembe / Kujitenga katika shughuli za kijamii, familia, na marafiki wako', 'Unakasirishwa sana na vurugu ukikosa simu yako au mtandao ukikatika', 'Unajisikia vibaya, huzuni, au wasiwasi mkubwa bila sababu wakati wa kutumia simu', 'Unajaribu kufunga macho lakini huwezi - mkono unarudi tena kwenye simu', 'Unajisikia hatia na kuchukia jinsi unavyotumia simu lakini huwezi kusitisha', 'Utabasamu umepotea kabisa, mara zote umekasirishwa au mwenye hasira', 'Unaweza kuwa na mawazo ya kukata tamaa au kujidhuru - TAFUTA MSAADA HARAKA', 'Unajiona huna thamani bila simu - hii ni ishara ya ugonjwa wa uraibu', 'Masomo au kazi yako yanayoathirika vibaya - unashindwa kuzingatia'],
+            conclusion: 'UKO katika HATARI kubwa! Unahitaji msaada wa kisaikolojia mara moja. Wasiliana na mtaalamu wa afya ya akili au piga simu ya dharura.'
+        }
+    },
+
+    getCurrentLevel() {
+        if (!app) return 'green';
+        const metrics = [app.getStatus(app.usage.social, app.limits.social), app.getStatus(app.usage.chat, app.limits.chat), app.getStatus(app.usage.call, app.limits.call), app.getStatus(app.usage.news, app.limits.news)];
+        let moodStatus = 'green';
+        if (app.selectedMood === 'stressed' || app.selectedMood === 'anxious') moodStatus = 'red';
+        else if (app.selectedMood === 'neutral') moodStatus = 'yellow';
+        metrics.push(moodStatus);
+
+        if (metrics.includes('red')) return 'red';
+        if (metrics.includes('yellow')) return 'yellow';
+        return 'green';
+    },
+
+    // Calculate stress score 0-100
+    getStressScore() {
+        if (!app) return 0;
+        let totalStress = 0;
+        let totalWeight = 0;
+        
+        // Usage weights
+        const types = ['social', 'chat', 'call', 'news'];
+        types.forEach(type => {
+            const cur = app.usage[type];
+            const lim = app.limits[type];
+            if (lim > 0) {
+                const pct = Math.min(1.5, cur / lim); // Cap at 150% for calculation
+                totalStress += pct * 25; // Each category max 25 points
+                totalWeight += 25;
+            }
+        });
+
+        // Mood weight (Max 25 points)
+        if (app.selectedMood === 'stressed' || app.selectedMood === 'anxious') totalStress += 25;
+        else if (app.selectedMood === 'neutral') totalStress += 12.5;
+        
+        return Math.min(100, Math.round(totalStress));
+    },
+
+    render() {
+        const current = this.getCurrentLevel();
+        const container = document.getElementById('psychAssessment');
+        container.innerHTML = Object.entries(this.levels).map(([key, level]) => {
+            const isActive = key === current;
+            const conclusionBg = key === 'green' ? 'var(--success-glow)' : key === 'yellow' ? 'var(--warning-glow)' : 'var(--danger-glow)';
+            const conclusionColor = key === 'green' ? '#059669' : key === 'yellow' ? '#D97706' : '#DC2626';
+            return `
+            <div class="psych-card ${level.cardClass} ${isActive ? 'active-level' : ''}">
+                <div class="psych-header">
+                    <div class="psych-dot ${level.dotClass}"></div>
+                    <h3>${level.name}</h3>
+                    <span class="psych-level-badge ${level.badgeClass}">${level.badge}</span>
+                </div>
+                <ul class="psych-symptoms level-${key}">${level.symptoms.map(s => `<li>${s}</li>`).join('')}</ul>
+                ${isActive ? `<div class="psych-you-are" style="background:${conclusionBg};color:${conclusionColor}"><span class="material-icons-round" style="font-size:18px">person_pin</span><strong>UNAKO HAPA SASA:</strong> ${level.conclusion}</div>` : ''}
+            </div>`;
+        }).join('');
+    }
+};
+
+/* ===================================================
+   GOVERN LINK - Mfumo wa Mzazi
+   =================================================== */
+const GovernLink = {
+    createLink(childId, childName, parentPhone) {
+        const code = 'GOV-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+        const data = this.getAllLinks();
+        data[code] = { code, parentId: auth.currentUser.id, parentName: auth.currentUser.username, childId, childName, parentPhone, createdAt: new Date().toLocaleString('sw-TZ'), cheatLogs: [], lastCheatTime: null };
+        localStorage.setItem('fh_govern_links', JSON.stringify(data));
+        return code;
+    },
+
+    joinLink(code) {
+        const data = this.getAllLinks();
+        const link = data[code];
+        if (!link) return null;
+        link.childJoined = true;
+        link.childJoinTime = new Date().toLocaleString('sw-TZ');
+        link.childDeviceId = DeviceDetect.getDeviceId();
+        localStorage.setItem('fh_govern_links', JSON.stringify(data));
+        return link;
+    },
+
+    getAllLinks() { try { return JSON.parse(localStorage.getItem('fh_govern_links') || '{}'); } catch(e) { return {}; } },
+
+    getParentLinks() {
+        if (!auth.currentUser) return {};
+        const data = this.getAllLinks();
+        const result = {};
+        Object.entries(data).forEach(([code, link]) => { if (link.parentId === auth.currentUser.id) result[code] = link; });
+        return result;
+    },
+
+    getChildLink() {
+        if (!auth.currentUser) return null;
+        const data = this.getAllLinks();
+        return Object.values(data).find(l => l.childId === auth.currentUser.id) || null;
+    },
+
+    removeLink(code) {
+        const data = this.getAllLinks();
+        delete data[code];
+        localStorage.setItem('fh_govern_links', JSON.stringify(data));
+    },
+
+    render() {
+        const el = document.getElementById('governContent');
+        if (!auth.currentUser) { el.innerHTML = ''; return; }
+
+        const childLink = this.getChildLink();
+        const parentLinks = this.getParentLinks();
+
+        let html = '';
+
+        if (childLink) {
+            html += `<div style="background:var(--primary-light);padding:1rem;border-radius:12px;margin-bottom:1rem;display:flex;align-items:center;gap:10px">
+                <span class="material-icons-round" style="color:var(--primary);font-size:32px">verified_user</span>
+                <div><div style="font-weight:700;font-size:.9rem">Umeunganishwa na Mzazi/Msimamizi</div>
+                <div style="font-size:.78rem;color:var(--text3)">Mzazi: ${app.escHTML(childLink.parentName)} | Kanuni: ${childLink.code}</div></div>
+            </div>`;
+        }
+
+        html += `<div style="background:var(--card-solid);padding:1rem;border-radius:12px;margin-bottom:1rem">
+            <h4 style="font-size:.88rem;font-weight:700;margin-bottom:.6rem;display:flex;align-items:center;gap:5px">
+                <span class="material-icons-round" style="color:var(--accent);font-size:20px">add_link</span>
+                Unda Govern Link kwa Mtoto/Mgonjwa
+            </h4>
+            <div style="font-size:.78rem;color:var(--text3);margin-bottom:.6rem">Weka jina la mtoto na namba ya simu itakayopokea ujumbe wa cheat.</div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:.6rem">
+                <input type="text" class="form-input" id="governChildName" placeholder="Jina la mtoto" style="flex:1;min-width:100px">
+                <input type="tel" class="form-input" id="governPhone" placeholder="+2557XXXXXXXX" style="flex:1;min-width:140px">
+            </div>
+            <button class="btn-add" onclick="app.createGovernLink()" style="width:100%"><span class="material-icons-round" style="font-size:16px;vertical-align:middle">link</span>Unda Govern Link</button>
+        </div>`;
+
+        html += `<div style="background:var(--card-solid);padding:1rem;border-radius:12px;margin-bottom:1rem">
+            <h4 style="font-size:.88rem;font-weight:700;margin-bottom:.6rem;display:flex;align-items:center;gap:5px">
+                <span class="material-icons-round" style="color:var(--primary);font-size:20px">login</span>
+                Jiunge na Govern Link
+            </h4>
+            <div style="display:flex;gap:5px;margin-bottom:.4rem">
+                <input type="text" class="form-input" id="governJoinCode" placeholder="GOV-XXXXXXXX" style="flex:1;text-transform:uppercase">
+                <button class="btn-add" onclick="app.joinGovernLink()">Jiunge</button>
+            </div>
+        </div>`;
+
+        if (Object.keys(parentLinks).length > 0) {
+            html += `<div class="govern-devices"><h4 style="font-size:.85rem;font-weight:700;margin-bottom:.6rem;display:flex;align-items:center;gap:5px"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">devices</span>Vifaa Vilivyounganishwa (${Object.keys(parentLinks).length})</h4>`;
+            Object.entries(parentLinks).forEach(([code, link]) => {
+                const hasCheat = link.cheatLogs && link.cheatLogs.length > 0;
+                const statusClass = hasCheat ? 'cheat' : (link.childJoined ? 'safe' : 'warn');
+                const statusText = hasCheat ? 'CHEAT IMENASWA' : (link.childJoined ? 'Salama' : 'Haijajiunga');
+                html += `<div class="govern-device ${hasCheat ? 'cheat-flagged' : ''}">
+                    <span class="material-icons-round" style="font-size:28px;color:${hasCheat ? 'var(--danger)' : 'var(--primary)'}">${hasCheat ? 'warning' : 'phone_android'}</span>
+                    <div class="gd-info"><div class="gd-name">${app.escHTML(link.childName)}</div><div class="gd-detail">Kanuni: ${code} | Simu: ${app.escHTML(link.parentPhone)}</div>
+                    ${hasCheat ? `<div class="gd-detail" style="color:var(--danger);font-weight:600">Cheat ya mwisho: ${link.cheatLogs[0].time}</div>` : ''}
+                    ${link.childJoined ? `<div class="gd-detail">Kifaa: ${link.childDeviceId || '-'} | Alijiunga: ${link.childJoinTime || '-'}</div>` : ''}</div>
+                    <span class="gd-status ${statusClass}">${statusText}</span>
+                    <button class="hdr-btn" onclick="app.removeGovernLink('${code}')" title="Ondoa" style="color:var(--danger)"><span class="material-icons-round" style="font-size:18px">delete</span></button>
+                </div>`;
+                if (hasCheat) {
+                    html += `<div style="margin-left:38px;margin-bottom:.5rem">${link.cheatLogs.slice(0, 3).map(cl => `<div style="font-size:.72rem;color:var(--danger);padding:2px 0">[${cl.time}] ${cl.message}</div>`).join('')}${link.cheatLogs.length > 3 ? `<div style="font-size:.7rem;color:var(--text3)">+${link.cheatLogs.length - 3} zaidi...</div>` : ''}</div>`;
+                }
+            });
+            html += '</div>';
+        }
+
+        el.innerHTML = html;
+    }
+};
+
+/* ===================================================
+   APP KUU
+   =================================================== */
+const app = {
+    usage: { social: 0, chat: 0, call: 0, news: 0 },
+    // Lowered Limits to 3 calls and 2 incoming to prevent stress
+    limits: { social: 30, chat: 20, call: 3, incomingCalls: 2, news: 10 }, 
+    callTracking: { made: 0, received: 0, phoneNumber: '' },
+    registeredNumbers: [],
+    selectedMood: null,
+    pendingAction: null,
+    announcementImage: null,
+    editingAnnId: null,
+    simulateUnknown: false, // New setting
+    autoReplyMsg: "Samahani, siwezi kupokea simu sasa. Nitakupigia baadaye.", // New setting
+    isLocked: false,
+    lockTimer: null,
+    missedInteractions: 0, // Tracks missed calls/msgs during lock
+
+    defaultSocialLinks: [
+        { id:'s1',name:'WhatsApp',url:'https://wa.me/',color:'#25D366',icon:'chat_bubble' },
+        { id:'s2',name:'Facebook',url:'https://www.facebook.com/',color:'#1877F2',icon:'group' },
+        { id:'s3',name:'Instagram',url:'https://www.instagram.com/',color:'#E4405F',icon:'photo_camera' },
+        { id:'s4',name:'Google',url:'https://www.google.com/',color:'#4285F4',icon:'search' },
+        { id:'s5',name:'Telegram',url:'https://t.me/',color:'#0088cc',icon:'send' },
+        { id:'s6',name:'Twitter/X',url:'https://x.com/',color:'#1DA1F2',icon:'tag' },
+        { id:'s7',name:'TikTok',url:'https://www.tiktok.com/',color:'#010101',icon:'music_note' },
+        { id:'s8',name:'YouTube',url:'https://www.youtube.com/',color:'#FF0000',icon:'play_circle_filled' },
+        { id:'s9',name:'LinkedIn',url:'https://www.linkedin.com/',color:'#0A66C2',icon:'work' },
+        { id:'s10',name:'Snapchat',url:'https://www.snapchat.com/',color:'#FFFC00',icon:'flash_on' },
+        { id:'s11',name:'Pinterest',url:'https://www.pinterest.com/',color:'#E60023',icon:'bookmark' },
+        { id:'s12',name:'Reddit',url:'https://www.reddit.com/',color:'#FF4500',icon:'forum' }
+    ],
+    socialLinks: [],
+
+    defaultNewsLinks: [
+        { id:'n1',name:'BBC News',url:'https://www.bbc.com/news',color:'#BB1919',icon:'public' },
+        { id:'n2',name:'CNN',url:'https://www.cnn.com/',color:'#CC0000',icon:'newspaper' },
+        { id:'n3',name:'Al Jazeera',url:'https://www.aljazeera.com/',color:'#FA9000',icon:'language' },
+        { id:'n4',name:'DW News',url:'https://www.dw.com/',color:'#014A99',icon:'public' },
+        { id:'n5',name:'Reuters',url:'https://www.reuters.com/',color:'#FF8000',icon:'article' },
+        { id:'n6',name:'The Guardian',url:'https://www.theguardian.com/',color:'#052962',icon:'description' },
+        { id:'n7',name:'Al Jazeera Sw',url:'https://www.aljazeera.net/',color:'#FA9000',icon:'translate' },
+        { id:'n8',name:'Mwananchi',url:'https://www.mwananchi.co.tz/',color:'#006633',icon:'local_library' }
+    ],
+    newsLinks: [],
+    selectedSocialColor:'#25D366',selectedNewsColor:'#BB1919',
+    availableColors:['#25D366','#1877F2','#E4405F','#4285F4','#0088cc','#1DA1F2','#FF0000','#FF8000','#FA9000','#014A99','#9C27B0','#607D8B','#006633','#052962','#010101','#E60023','#0A66C2','#CC0000','#BB1919','#FF4500'],
+
+    init() {
+        this.loadData();
+        this.checkDailyReset();
+        this.bindEvents();
+        this.renderAll();
+        this.updateActiveUsers();
+        this.updateAllTrafficLights();
+        this.updateCallButtonStates();
+        this.updateStressLevel(); // Initialize stress
+    },
+
+    loadData() {
+        const uid = auth.currentUser ? auth.currentUser.id : 'default';
+        try {
+            const u = localStorage.getItem('fh_usage_' + uid); if (u) this.usage = JSON.parse(u);
+            const l = localStorage.getItem('fh_limits_' + uid); if (l) this.limits = JSON.parse(l);
+            const c = localStorage.getItem('fh_calls_' + uid); if (c) this.callTracking = JSON.parse(c);
+            const s = localStorage.getItem('fh_socialLinks_' + uid); this.socialLinks = s ? JSON.parse(s) : JSON.parse(JSON.stringify(this.defaultSocialLinks));
+            const n = localStorage.getItem('fh_newsLinks_' + uid); this.newsLinks = n ? JSON.parse(n) : JSON.parse(JSON.stringify(this.defaultNewsLinks));
+            const rn = localStorage.getItem('fh_registeredNumbers_' + uid); this.registeredNumbers = rn ? JSON.parse(rn) : [];
+            
+            // Load new settings
+            const set = localStorage.getItem('fh_settings_' + uid);
+            if (set) {
+                const sData = JSON.parse(set);
+                this.simulateUnknown = sData.simulateUnknown || false;
+                this.autoReplyMsg = sData.autoReplyMsg || this.autoReplyMsg;
+            }
+        } catch(e) { this.socialLinks = JSON.parse(JSON.stringify(this.defaultSocialLinks)); this.newsLinks = JSON.parse(JSON.stringify(this.defaultNewsLinks)); this.registeredNumbers = []; }
+    },
+
+    saveData() {
+        const uid = auth.currentUser ? auth.currentUser.id : 'default';
+        localStorage.setItem('fh_usage_' + uid, JSON.stringify(this.usage));
+        localStorage.setItem('fh_limits_' + uid, JSON.stringify(this.limits));
+        localStorage.setItem('fh_calls_' + uid, JSON.stringify(this.callTracking));
+        localStorage.setItem('fh_socialLinks_' + uid, JSON.stringify(this.socialLinks));
+        localStorage.setItem('fh_newsLinks_' + uid, JSON.stringify(this.newsLinks));
+        localStorage.setItem('fh_registeredNumbers_' + uid, JSON.stringify(this.registeredNumbers));
+        
+        // Save new settings
+        localStorage.setItem('fh_settings_' + uid, JSON.stringify({
+            simulateUnknown: this.simulateUnknown,
+            autoReplyMsg: this.autoReplyMsg
+        }));
+    },
+
+    checkDailyReset() {
+        const uid = auth.currentUser ? auth.currentUser.id : 'default';
+        const today = new Date().toDateString();
+        if (localStorage.getItem('fh_lastDate_' + uid) !== today) {
+            this.usage = { social: 0, chat: 0, call: 0, news: 0 };
+            this.callTracking.made = 0; this.callTracking.received = 0;
+            localStorage.setItem('fh_lastDate_' + uid, today);
+            this.saveData();
+        }
+    },
+
+    bindEvents() {
+        document.querySelectorAll('.mood-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+                e.currentTarget.classList.add('selected');
+                this.selectedMood = e.currentTarget.dataset.mood;
+                this.handleMood();
+            });
+        });
+        ['social','chat','call','news','incoming'].forEach(k => {
+            const inp = document.getElementById('limit-' + k);
+            const disp = document.getElementById('val-' + k);
+            if (inp && disp) inp.addEventListener('input', () => disp.textContent = inp.value);
+        });
+        document.getElementById('settingsModal').addEventListener('click', e => { if (e.target === document.getElementById('settingsModal')) this.closeSettings(); });
+        document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') auth.login(); });
+        document.getElementById('signupConfirm').addEventListener('keydown', e => { if (e.key === 'Enter') auth.signup(); });
+        document.getElementById('forgotConfirmPass').addEventListener('keydown', e => { if (e.key === 'Enter') auth.resetPassword(); });
+        document.getElementById('inputRegisterNumber').addEventListener('keydown', e => { if (e.key === 'Enter') this.registerNumber(); });
+        
+        // Toggle Listener
+        document.getElementById('simulateUnknown').addEventListener('change', (e) => {
+            this.simulateUnknown = e.target.checked;
+        });
+    },
+
+    renderAll() {
+        this.renderSocialLinks(); this.renderNewsLinks(); this.renderLinkManagers(); this.renderColorPickers();
+        this.renderAnnouncements(); this.renderRegisteredNumbers(); this.renderTLChatGrid();
+        this.renderCheatSection(); this.renderGovernSection(); Psychology.render();
+        this.updateUI(); this.updateAdminPanel();
+    },
+
+    /* --- NAMBA ZILIZOSAJILIWA --- */
+    cleanNumber(n) { return (n||'').replace(/[\s\-\(\)\.]/g,''); },
+    isNumberRegistered(n) { if (!n) return false; const c = this.cleanNumber(n); return c ? this.registeredNumbers.some(r => this.cleanNumber(r) === c) : false; },
+
+    registerNumber() {
+        const inp = document.getElementById('inputRegisterNumber');
+        const num = inp.value.trim();
+        if (!num) { this.showToast('Andika namba ya simu.'); return; }
+        if (num.length < 8) { this.showToast('Namba iko fupi sana.'); return; }
+        if (this.isNumberRegistered(num)) { this.showToast('Namba imesajiliwa tayari.'); return; }
+        this.registeredNumbers.push(num); inp.value = '';
+        this.saveData(); this.renderRegisteredNumbers(); this.showToast('Namba ' + num + ' imesajiliwa!');
+        if (!this.callTracking.phoneNumber) { this.callTracking.phoneNumber = num; this.saveData(); }
+    },
+
+    unregisterNumber(i) {
+        const removed = this.registeredNumbers[i];
+        this.registeredNumbers.splice(i, 1);
+        if (this.cleanNumber(this.callTracking.phoneNumber) === this.cleanNumber(removed)) {
+            this.callTracking.phoneNumber = this.registeredNumbers[0] || '';
+        }
+        this.saveData(); this.renderRegisteredNumbers(); this.updateUI(); this.updateCallButtonStates();
+    },
+
+    setActiveNumber(num) {
+        if (!this.isNumberRegistered(num)) return;
+        this.callTracking.phoneNumber = num; this.saveData();
+        this.renderRegisteredNumbers(); this.updateUI(); this.updateCallButtonStates();
+    },
+
+    renderRegisteredNumbers() {
+        const el = document.getElementById('regNumbersList');
+        if (!this.registeredNumbers.length) { el.innerHTML = '<div class="empty-reg">Hakuna namba zilizosajiliwa.</div>'; return; }
+        const ac = this.cleanNumber(this.callTracking.phoneNumber);
+        el.innerHTML = this.registeredNumbers.map((num, i) => {
+            const isA = this.cleanNumber(num) === ac;
+            return `<div class="reg-num-item ${isA?'active-num':''}"><div><span class="num-text">${this.escHTML(num)}</span>${isA?'<span class="num-badge">INATUMIKA</span>':''}</div><div class="num-actions">${!isA?`<button onclick="app.setActiveNumber('${num.replace(/'/g,"\\'")}')" title="Tumia"><span class="material-icons-round" style="font-size:16px;color:var(--success)">phone</span></button>`:''}<button class="del-num" onclick="app.unregisterNumber(${i})" title="Ondoa"><span class="material-icons-round" style="font-size:16px">close</span></button></div></div>`;
+        }).join('');
+        const sb = document.getElementById('regStatusBadge');
+        if (sb) {
+            if (this.callTracking.phoneNumber && this.isNumberRegistered(this.callTracking.phoneNumber)) sb.innerHTML = '<span style="color:var(--success)"><span class="material-icons-round" style="font-size:13px;vertical-align:middle">check_circle</span> Namba imesajiliwa</span>';
+            else if (this.callTracking.phoneNumber) sb.innerHTML = '<span style="color:var(--danger)"><span class="material-icons-round" style="font-size:13px;vertical-align:middle">block</span> HAIJASAJILIWA</span>';
+            else sb.innerHTML = '<span style="color:var(--text3)">Hakuna namba</span>';
+        }
+    },
+
+    updateCallButtonStates() {
+        const num = this.callTracking.phoneNumber; const isR = this.isNumberRegistered(num);
+        const bm = document.getElementById('btnMakeCall'); const br = document.getElementById('btnLogReceived');
+        const pd = document.getElementById('phoneDisplay'); const w = document.getElementById('unregisteredWarning');
+        if (num && !isR) { bm.classList.add('disabled-call'); br.classList.add('disabled-call'); pd.classList.add('blocked'); w.style.display='flex'; }
+        else if (!num) { bm.classList.add('disabled-call'); br.classList.add('disabled-call'); pd.classList.remove('blocked'); w.style.display='none'; }
+        else { bm.classList.remove('disabled-call'); br.classList.remove('disabled-call'); pd.classList.remove('blocked'); w.style.display='none'; }
+    },
+
+    /* --- TRAFFIC LIGHT CHAT GRID --- */
+    renderTLChatGrid() {
+        const grid = document.getElementById('tlChatGrid');
+        const items = this.socialLinks.map(link => {
+            const status = this.getStatus(this.usage.chat, this.limits.chat);
+            const count = this.usage.chat;
+            const ic = link.color === '#FFFC00' ? '#333' : link.color;
+            return `<div class="tl-chat-item status-${status}">
+                <span class="material-icons-round" style="color:${ic}">${link.icon||'link'}</span>
+                <div class="tl-chat-name">${link.name}</div>
+                <div class="tl-chat-count">${count} / ${this.limits.chat}</div>
+                ${this.trafficLightHTML(status)}
+            </div>`;
+        });
+        const callTotal = this.callTracking.made + this.callTracking.received;
+        const callStatus = this.getStatus(callTotal, Math.max(1, this.limits.call));
+        items.push(`<div class="tl-chat-item status-${callStatus}">
+            <span class="material-icons-round" style="color:var(--success)">phone_in_talk</span>
+            <div class="tl-chat-name">Simu</div>
+            <div class="tl-chat-count">${callTotal} / ${this.limits.call}</div>
+            ${this.trafficLightHTML(callStatus)}
+        </div>`);
+        const newsStatus = this.getStatus(this.usage.news, this.limits.news);
+        items.push(`<div class="tl-chat-item status-${newsStatus}">
+            <span class="material-icons-round" style="color:#f4511e">article</span>
+            <div class="tl-chat-name">Habari</div>
+            <div class="tl-chat-count">${this.usage.news} / ${this.limits.news}</div>
+            ${this.trafficLightHTML(newsStatus)}
+        </div>`);
+        grid.innerHTML = items.join('');
+    },
+
+    /* --- CHEAT SECTION --- */
+    renderCheatSection() {
+        const el = document.getElementById('cheatContent');
+        const logs = CheatDetect.getLogs();
+        const hasCritical = logs.some(l => l.level === 'CRITICAL');
+        el.innerHTML = `
+            <div class="cheat-status ${hasCritical ? 'flagged' : 'safe'}">
+                <span class="material-icons-round" style="font-size:24px">${hasCritical ? 'warning' : 'verified_user'}</span>
+                ${hasCritical ? 'CHEAT IMEGUNDULIKA - Angalia logi zilizopo' : 'Mfumo uko salama - Hakuna cheat iliyogundulika'}
+            </div>
+            ${logs.length > 0 ? `<div class="cheat-log">${logs.slice(0, 10).map(l => `<div class="cheat-log-item"><span class="cl-time">${l.time}</span><span class="cl-msg">[${l.level}] ${l.message}</span></div>`).join('')}</div>` : '<div class="empty-state">Hakuna shughuli shukufuli zilizogundulika.</div>'}
+        `;
+    },
+
+    /* --- GOVERN SECTION --- */
+    renderGovernSection() { GovernLink.render(); },
+
+    createGovernLink() {
+        const name = document.getElementById('governChildName').value.trim();
+        const phone = document.getElementById('governPhone').value.trim();
+        if (!name) { this.showToast('Weka jina la mtoto/mgonjwa.'); return; }
+        if (!phone || phone.length < 8) { this.showToast('Weka namba ya simu sahihi.'); return; }
+        const childUsername = name.toLowerCase().replace(/\s+/g, '_') + '_child';
+        let childUser = auth.users.find(u => u.username === childUsername);
+        if (!childUser) {
+            childUser = { id: 'u_' + Date.now(), username: childUsername, password: 'child123', role: 'user', createdAt: new Date().toISOString().split('T')[0], online: false, emergencyPhone: phone };
+            auth.users.push(childUser); auth.saveUsers();
+        }
+        const code = GovernLink.createLink(childUser.id, name, phone);
+        document.getElementById('governChildName').value = '';
+        document.getElementById('governPhone').value = '';
+        this.renderGovernSection();
+        this.showToast('Govern Link imeundwa: ' + code);
+    },
+
+    joinGovernLink() {
+        const code = document.getElementById('governJoinCode').value.trim().toUpperCase();
+        if (!code) { this.showToast('Weka kanuni ya Govern Link.'); return; }
+        const link = GovernLink.joinLink(code);
+        if (!link) { this.showToast('Kanuni sio sahihi au haipatikani.'); return; }
+        document.getElementById('governJoinCode').value = '';
+        this.renderGovernSection();
+        this.showToast('Umeunganishwa na ' + link.parentName + ' kwa mafanikio!');
+    },
+
+    removeGovernLink(code) {
+        GovernLink.removeLink(code);
+        this.renderGovernSection();
+        this.showToast('Govern link imeondolewa.');
+    },
+
+    closeCheatAlert() { document.getElementById('cheatAlertModal').classList.remove('active'); },
+
+    /* --- STRESS & LOCKING LOGIC --- */
+    updateStressLevel() {
+        const score = Psychology.getStressScore();
+        const fill = document.getElementById('stressFill');
+        const label = document.getElementById('stressLabel');
+        
+        fill.style.width = score + '%';
+        label.textContent = 'Stress Level: ' + score + '%';
+        
+        if (score < 50) {
+            fill.style.backgroundColor = 'var(--success)';
+            label.style.color = 'var(--success)';
+        } else if (score < 85) {
+            fill.style.backgroundColor = 'var(--warning)';
+            label.style.color = 'var(--warning)';
+        } else {
+            fill.style.backgroundColor = 'var(--danger)';
+            label.style.color = 'var(--danger)';
+        }
+
+        // Check if we should lock the phone (100% stress)
+        if (score >= 100 && !this.isLocked) {
+            this.triggerPhoneLock();
+        }
+    },
+
+    triggerPhoneLock() {
+        this.isLocked = true;
+        const overlay = document.getElementById('lockOverlay');
+        const timerEl = document.getElementById('lockTimer');
+        const btn = document.getElementById('lockBtn');
+        
+        overlay.classList.add('active');
+        
+        // 30 Seconds Lock
+        let timeLeft = 30;
+        timerEl.textContent = `00:${timeLeft}`;
+        
+        clearInterval(this.lockTimer);
+        this.lockTimer = setInterval(() => {
+            timeLeft--;
+            timerEl.textContent = `00:${timeLeft < 10 ? '0' + timeLeft : timeLeft}`;
+            
+            if (timeLeft <= 0) {
+                btn.classList.add('ready');
+                btn.textContent = "Fungua Sasa";
+                clearInterval(this.lockTimer);
+            }
+        }, 1000);
+    },
+
+    unlockPhone() {
+        const btn = document.getElementById('lockBtn');
+        if (!btn.classList.contains('ready')) return;
+        
+        this.isLocked = false;
+        document.getElementById('lockOverlay').classList.remove('active');
+        btn.classList.remove('ready');
+        btn.textContent = "Fungua Sasa";
+        
+        // Reminder Logic: Check missed interactions
+        if (this.missedInteractions > 0) {
+            setTimeout(() => {
+                this.showToast(`KUMBUKA: Ulipotea ${this.missedInteractions} mawasiliano wakati wa mapumziko. Jaribu kujibu muhimu.`);
+                this.missedInteractions = 0; // Reset after reminder
+                this.saveData();
+            }, 1000);
+        } else {
+            this.showToast('Simu imefunguliwa. Tafadhali pumzika.');
+        }
+    },
+
+    sendAutoReply(number, reason) {
+        // Simulation of sending SMS
+        const msg = `SMS imejumwa kwa ${number}: "${this.autoReplyMsg}" (${reason})`;
+        this.showToast(msg);
+        // In a real app, this would call an SMS API.
+    },
+
+    /* --- SAUTI --- */
+    speakHealthMessage() {
+        if ('speechSynthesis' in window) {
+            speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance('Afya yako ni muhimu kwetu, tafadhali pumzika kisha utarudi baadae');
+            msg.lang = 'sw'; msg.rate = 0.85; msg.pitch = 1.0; msg.volume = 1.0;
+            const ind = document.getElementById('speakingIndicator');
+            if (ind) ind.style.display = 'inline-flex';
+            msg.onend = () => { if (ind) ind.style.display = 'none'; };
+            msg.onerror = () => { if (ind) ind.style.display = 'none'; };
+            speechSynthesis.speak(msg);
+        }
+    },
+    stopSpeaking() {
+        if ('speechSynthesis' in window) { speechSynthesis.cancel(); const i = document.getElementById('speakingIndicator'); if (i) i.style.display = 'none'; }
+    },
+
+    /* ---Mfumo wa Taa za Tahadhari --- */
+    getStatus(cur, lim) { if (lim <= 0) return 'green'; const p = (cur/lim)*100; if (p >= 100) return 'red'; if (p >= 70) return 'yellow'; return 'green'; },
+    trafficLightHTML(s) { const l = { green:'Nzuri', yellow:'Tahadhari', red:'Hatari' }; return `<div class="traffic-light ${s}"><span class="tl-dot"></span>${l[s]||''}</div>`; },
+
+    isInDangerZone() {
+        const m = [this.getStatus(this.usage.social,this.limits.social),this.getStatus(this.usage.chat,this.limits.chat),this.getStatus(this.usage.call,this.limits.call),this.getStatus(this.usage.news,this.limits.news)];
+        return m.includes('red');
+    },
+
+    updateAllTrafficLights() {
+        const ct = this.callTracking.made + this.callTracking.received;
+        document.getElementById('callTrafficLight').innerHTML = this.trafficLightHTML(this.getStatus(ct, Math.max(1, this.limits.call)));
+        let ms = 'green';
+        if (this.selectedMood === 'stressed' || this.selectedMood === 'anxious') ms = 'red';
+        else if (this.selectedMood === 'neutral') ms = 'yellow';
+        document.getElementById('moodTrafficLight').innerHTML = this.trafficLightHTML(ms);
+        document.getElementById('socialTrafficLight').innerHTML = this.trafficLightHTML(this.getStatus(this.usage.chat, this.limits.chat));
+        document.getElementById('newsTrafficLight').innerHTML = this.trafficLightHTML(this.getStatus(this.usage.news, this.limits.news));
+        this.updateOverallStatus();
+        this.updateStressLevel(); // Update stress meter
+    },
+
+    updateOverallStatus() {
+        const m = [this.getStatus(this.usage.social,this.limits.social),this.getStatus(this.usage.chat,this.limits.chat),this.getStatus(this.usage.call,this.limits.call),this.getStatus(this.usage.news,this.limits.news)];
+        let ms = 'green';
+        if (this.selectedMood==='stressed'||this.selectedMood==='anxious') ms='red';
+        else if (this.selectedMood==='neutral') ms='yellow';
+        m.push(ms);
+        let o = 'green'; if (m.includes('red')) o='red'; else if (m.includes('yellow')) o='yellow';
+        const t = document.getElementById('overallTitle'), d = document.getElementById('overallDesc'), ic = document.getElementById('overallIcon');
+        const g = document.getElementById('tlCGreen'), y = document.getElementById('tlCYellow'), r = document.getElementById('tlCRed');
+        g.className='tl-circle'; y.className='tl-circle'; r.className='tl-circle';
+        if (o==='green') { t.textContent='Hali Yako ni Nzuri'; d.textContent='Matumizi yako yako katika kiwango cha salama.'; ic.textContent='verified_user'; g.classList.add('a-green'); }
+        else if (o==='yellow') { t.textContent='Tahadhari - Karibu Kuvuka Kiwango'; d.textContent='Baadhi ya matumizi yanakaribia kikwacho. Punguza kidogo.'; ic.textContent='warning'; y.classList.add('a-yellow'); }
+        else { t.textContent='Hatari - Umekwishavuka Kiwango!'; d.textContent='Matumizi yamevuka mipaka. Pumzika na kupunguza.'; ic.textContent='dangerous'; r.classList.add('a-red'); }
+    },
+
+    updateActiveUsers() { document.getElementById('activeUsersCount').textContent = auth.getOnlineCount(); },
+
+    /* --- SIMU --- */
+    makeCall(e) {
+        e.preventDefault();
+        if (this.isLocked) return; // Can't call if locked
+        const num = this.callTracking.phoneNumber;
+        if (!num) { this.showToast('Weka namba ya simu kwanza.'); return; }
+        if (!this.isNumberRegistered(num)) { this.showToast('SIMU IMEZUIWA! Namba haijasajiliwa.'); this.speakHealthMessage(); return; }
+        const ct = this.callTracking.made + this.callTracking.received;
+        if (ct >= this.limits.call) { 
+            this.speakHealthMessage(); 
+            this.triggerAlert('call'); 
+            this.missedInteractions++; // Track missed attempt
+            this.saveData();
+            return; 
+        }
+        this.callTracking.made++; this.usage.call += 5; this.saveData(); this.renderAll();
+        window.location.href = 'tel:' + num.replace(/\s/g, '');
+    },
+
+    logReceived() {
+        if (this.isLocked) return; // Can't receive if locked
+        const num = this.callTracking.phoneNumber;
+
+        // 1. Check Unknown Number Simulation
+        if (this.simulateUnknown) {
+            this.sendAutoReply("Unknown Number", "Unknown");
+            this.showToast('SIMU IMEZUIWA: Namba haipo kwenye orodha yako.');
+            return;
+        }
+
+        // 2. Check Registration
+        if (num && !this.isNumberRegistered(num)) {
+            this.sendAutoReply(num, "Unregistered");
+            this.showToast('SIMU IMEZUIWA: Namba hii haijasajiliwa.');
+            this.speakHealthMessage();
+            return;
+        }
+
+        // 3. Check Incoming Limit
+        if (this.callTracking.received >= this.limits.incomingCalls) {
+            this.sendAutoReply(num, "Limit Exceeded");
+            this.showToast('IMEVUKA KIKWACHO CHA SIMU ZINAZOINGIA.');
+            this.speakHealthMessage();
+            this.triggerAlert('incoming_call');
+            this.missedInteractions++; // Track missed incoming call
+            this.saveData();
+            return;
+        }
+
+        // Allow Call
+        this.callTracking.received++; this.saveData(); this.renderAll(); this.showToast('Simu iliyopokelewa imerekodiwa');
+    },
+
+    resetCallCounters() { 
+        this.callTracking.made = 0; 
+        this.callTracking.received = 0; 
+        this.missedInteractions = 0; // Also reset missed tracker
+        this.saveData(); 
+        this.renderAll(); 
+        this.showToast('Vihesabu vimeresetiwa'); 
+    },
+
+    /* --- MATUMIZI --- */
+    trackUsage(type, cb) {
+        const inc = (type==='social'||type==='call') ? 5 : 1;
+        if (this.usage[type] >= this.limits[type] && this.usage[type] < this.limits[type] + inc) {
+            this.triggerAlert(type, () => { this.usage[type] += inc; this.saveData(); this.renderAll(); if (cb) cb(); });
+        } else { this.usage[type] += inc; this.saveData(); this.renderAll(); if (cb) cb(); }
+    },
+
+    triggerAlert(type, cb) {
+        this.pendingAction = cb;
+        const names = { social:'Mtandao', chat:'Ujumbe', call:'Simu', news:'Habari', incoming_call:'Simu Zinazoingia' };
+        document.getElementById('alertMessage').textContent = 'Umevuka kikwacho cha ' + (names[type]||type) + '.';
+        document.getElementById('alertModal').classList.add('active');
+        this.speakHealthMessage();
+    },
+
+    handleAlertResponse(proceed) {
+        this.stopSpeaking();
+        document.getElementById('alertModal').classList.remove('active');
+        if (proceed && this.pendingAction) this.pendingAction();
+        this.pendingAction = null;
+    },
+
+    /* --- MOOD --- */
+    handleMood() {
+        const fb = document.getElementById('moodFeedback');
+        const msgs = { stressed:'Pumzika. Toka kwenye skrini kwa dakika 10.', anxious:'Punguza kusoma habari. Pumua kwa kina.', neutral:'Unawasiliana vizuri. Endelea kuzingatia.', good:'Kazi nzuri! Maisha yako ya kidijitali yako nzuri!', great:'Bora kabisa! Uko kamili udhibiti wa leo.' };
+        fb.textContent = msgs[this.selectedMood] || '';
+        this.updateAllTrafficLights(); Psychology.render(); this.renderTLChatGrid();
+    },
+
+    /* --- VIUNGO --- */
+    getWhatsAppUrl() { const n = this.callTracking.phoneNumber.replace(/[^0-9]/g,''); return n ? 'https://wa.me/'+n : 'https://wa.me/'; },
+
+    renderSocialLinks() {
+        const grid = document.getElementById('socialLinksGrid');
+        if (!this.socialLinks.length) { grid.innerHTML = '<div class="empty-state">Hakuna viungo</div>'; return; }
+        grid.innerHTML = this.socialLinks.map(link => {
+            let url = link.url; if (link.id==='s1') url = this.getWhatsAppUrl();
+            const ic = link.color==='#FFFC00' ? '#333' : link.color;
+            return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="link-btn" style="--link-color:${link.color}" onclick="app.trackUsage('chat')"><span class="material-icons-round" style="color:${ic}">${link.icon||'link'}</span><span>${link.name}</span></a>`;
+        }).join('');
+    },
+
+    renderNewsLinks() {
+        const grid = document.getElementById('newsLinksGrid');
+        if (!this.newsLinks.length) { grid.innerHTML = '<div class="empty-state">Hakuna viungo</div>'; return; }
+        grid.innerHTML = this.newsLinks.map(link => `<a href="${link.url}" target="_blank" rel="noopener noreferrer" class="link-btn" style="--link-color:${link.color}" onclick="app.trackUsage('news')"><span class="material-icons-round" style="color:${link.color}">${link.icon||'article'}</span><span>${link.name}</span></a>`).join('');
+    },
+
+    renderLinkManagers() { this.renderLinkList('social'); this.renderLinkList('news'); },
+    renderLinkList(type) {
+        const el = document.getElementById(type==='social'?'socialLinksList':'newsLinksList');
+        const links = type==='social' ? this.socialLinks : this.newsLinks;
+        if (!links.length) { el.innerHTML = '<div class="empty-state">Hakuna</div>'; return; }
+        el.innerHTML = links.map(l => `<div class="link-manager-item" style="--link-color:${l.color}"><div class="link-info"><div class="lname">${l.name}</div><div class="lurl">${l.url}</div></div><button class="remove-link" onclick="app.removeLink('${type}','${l.id}')"><span class="material-icons-round" style="font-size:18px">delete</span></button></div>`).join('');
+    },
+    renderColorPickers() { this.renderColorPicker('social'); this.renderColorPicker('news'); },
+    renderColorPicker(type) {
+        const el = document.getElementById(type==='social'?'socialColorPicker':'newsColorPicker');
+        const sel = type==='social' ? this.selectedSocialColor : this.selectedNewsColor;
+        el.innerHTML = this.availableColors.map(c => `<div class="color-opt ${c===sel?'selected':''}" style="background:${c};${c==='#010101'||c==='#052962'?'border:1px solid #555':''}" onclick="app.selectColor('${type}','${c}')"></div>`).join('');
+    },
+    selectColor(type, color) { if (type==='social') this.selectedSocialColor=color; else this.selectedNewsColor=color; this.renderColorPicker(type); },
+    addLink(type) {
+        const nEl = document.getElementById(type==='social'?'newSocialName':'newNewsName');
+        const uEl = document.getElementById(type==='social'?'newSocialUrl':'newNewsUrl');
+        const name = nEl.value.trim(); let url = uEl.value.trim();
+        if (!name||!url) { this.showToast('Jina na URL zinahitajika'); return; }
+        if (!url.startsWith('http')) url = 'https://'+url;
+        const color = type==='social' ? this.selectedSocialColor : this.selectedNewsColor;
+        const link = { id: type+'_'+Date.now(), name, url, color, icon:'link' };
+        if (type==='social') this.socialLinks.push(link); else this.newsLinks.push(link);
+        nEl.value=''; uEl.value=''; this.saveData(); this.renderAll(); this.showToast('Kiungo kimeweongezwa');
+    },
+    removeLink(type, id) {
+        if (type==='social') this.socialLinks = this.socialLinks.filter(l=>l.id!==id);
+        else this.newsLinks = this.newsLinks.filter(l=>l.id!==id);
+        this.saveData(); this.renderAll(); this.showToast('Kiungo kimeweondolewa');
+    },
+
+    /* --- UI --- */
+    updateUI() {
+        document.getElementById('callsMade').textContent = this.callTracking.made;
+        document.getElementById('callsReceived').textContent = this.callTracking.received;
+        document.getElementById('phoneNumText').textContent = this.callTracking.phoneNumber || 'Hakuna Namba';
+        this.updateBar('social',this.usage.social,this.limits.social,'dak');
+        this.updateBar('chat',this.usage.chat,this.limits.chat,'uj');
+        this.updateBar('call',this.usage.call,this.limits.call,'dak');
+        this.updateBar('news',this.usage.news,this.limits.news,'fung');
+        document.getElementById('totalTime').textContent = this.usage.social + this.usage.call + (this.usage.chat*2) + (this.usage.news*2);
+        this.updateCallButtonStates();
+    },
+
+    updateBar(key, cur, lim, suffix) {
+        const bar = document.getElementById('bar-'+key);
+        const maxS = Math.max(1, lim*1.5);
+        let pct = Math.min(100, (cur/maxS)*100);
+        bar.style.height = pct+'%'; bar.setAttribute('data-val', cur+' '+suffix);
+        const s = this.getStatus(cur, lim); bar.className = 'bar';
+        bar.classList.add(s==='green'?'green-bar':s==='yellow'?'yellow-bar':'red-bar');
+    },
+
+    /* --- MATANGAZO (SUPER ADMIN FEATURES) --- */
+    getAnnouncements() { try { const d = localStorage.getItem('fh_announcements'); return d ? JSON.parse(d) : []; } catch(e) { return []; } },
+    saveAnnouncements(a) { localStorage.setItem('fh_announcements', JSON.stringify(a)); },
+
+    renderAnnouncements() {
+        const list = document.getElementById('announcementsList');
+        const adminList = document.getElementById('adminAnnList');
+        const anns = this.getAnnouncements();
+        
+        // Admin/Super Admin Check
+        const isSA = auth.currentUser && auth.currentUser.role === 'super_admin';
+        const isA = auth.currentUser && auth.currentUser.role === 'admin';
+        const isAdmin = isSA || isA;
+        
+        const vis = anns.filter(a => a.visible);
+        list.innerHTML = vis.length ? vis.map(a => `<div class="announcement-card"><h3>${this.escHTML(a.title)}</h3><p>${this.escHTML(a.content)}</p>${a.image?`<img src="${a.image}" alt="Tangazo">`:''}<div class="announcement-meta">Kwa: ${this.escHTML(a.createdBy)} &mdash; ${a.createdAt}</div></div>`).join('') : '<div class="no-announcements"><span class="material-icons-round" style="font-size:36px;color:var(--text3);display:block;margin-bottom:6px">campaign</span>Hakuna matangazo</div>';
+
+        if (isAdmin) {
+            adminList.innerHTML = anns.length ? '<h4 style="font-size:.82rem;color:var(--text3);margin:.8rem 0 .4rem">Yote ('+anns.length+')</h4>' + anns.map(a => {
+                // Edit, Hide, Delete logic for Super Admin
+                let actions = '';
+                if (isSA) {
+                    actions += `<button class="ann-btn edit" onclick="app.startEditingAnn('${a.id}')"><span class="material-icons-round" style="font-size:14px">edit</span>Hariri</button>`;
+                }
+                actions += a.visible?`<button class="ann-btn hide" onclick="app.toggleAnn('${a.id}')"><span class="material-icons-round" style="font-size:14px">visibility_off</span>Ficha</button>`:`<button class="ann-btn show" onclick="app.toggleAnn('${a.id}')"><span class="material-icons-round" style="font-size:14px">visibility</span>Onesha</button>`;
+                
+                if (isSA) {
+                     actions += `<button class="ann-btn delete" onclick="app.deleteAnn('${a.id}')"><span class="material-icons-round" style="font-size:14px">delete</span>Futa</button>`;
+                }
+
+                return `<div class="announcement-card" style="${!a.visible?'opacity:.5;':''}"><h3>${this.escHTML(a.title)} ${!a.visible?'<span style="font-size:.68rem;background:var(--warning-glow);color:#D97706;padding:2px 7px;border-radius:8px;font-weight:700">IMEFICHWA</span>':''}</h3><p>${this.escHTML(a.content)}</p>${a.image?`<img src="${a.image}" style="max-height:120px" alt="">`:''}<div class="announcement-meta">${this.escHTML(a.createdBy)} &mdash; ${a.createdAt}</div><div class="announcement-actions">${actions}</div></div>`;
+            }).join('') : '<div class="empty-state">Hakuna matangazo.</div>';
+        }
+    },
+
+    // Edit functionality
+    startEditingAnn(id) {
+        const anns = this.getAnnouncements();
+        const ann = anns.find(a => a.id === id);
+        if (!ann) return;
+
+        this.editingAnnId = id;
+        document.getElementById('annTitleInput').value = ann.title;
+        document.getElementById('annContentInput').value = ann.content;
+        
+        // Handle image preview
+        if (ann.image) {
+            this.announcementImage = ann.image;
+            document.getElementById('annImgPreview').style.display = 'inline-block';
+            document.getElementById('annImgPreviewSrc').src = ann.image;
+            document.getElementById('annFileName').textContent = 'Picha iliyopo';
+        } else {
+            this.removeImageUI();
+        }
+
+        // Change button to Update
+        const btn = document.getElementById('btnSubmitAnn');
+        btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;vertical-align:middle;margin-right:3px">save</span>Sasisha Tangazo';
+        btn.onclick = () => app.createAnnouncement();
+
+        // Show cancel button
+        document.getElementById('btnCancelEditAnn').style.display = 'block';
+        
+        // Scroll to form
+        document.getElementById('annManagement').scrollIntoView({behavior:'smooth'});
+    },
+
+    cancelEditAnnouncement() {
+        this.editingAnnId = null;
+        this.removeImage(); // Clear current edit state image
+        
+        document.getElementById('annTitleInput').value = '';
+        document.getElementById('annContentInput').value = '';
+        
+        // Reset button to Create
+        const btn = document.getElementById('btnSubmitAnn');
+        btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;vertical-align:middle;margin-right:3px">add_circle</span>Post Tangazo';
+        btn.onclick = () => app.createAnnouncement();
+
+        document.getElementById('btnCancelEditAnn').style.display = 'none';
+    },
+
+    createAnnouncement() {
+        const title = document.getElementById('annTitleInput').value.trim();
+        const content = document.getElementById('annContentInput').value.trim();
+        if (!title||!content) { this.showToast('Jaza kichwa na maudhui.'); return; }
+
+        const anns = this.getAnnouncements();
+
+        if (this.editingAnnId) {
+            // UPDATE EXISTING
+            const idx = anns.findIndex(a => a.id === this.editingAnnId);
+            if (idx !== -1) {
+                anns[idx].title = title;
+                anns[idx].content = content;
+                // Only update image if a new one is provided (via this.announcementImage)
+                if (this.announcementImage) {
+                    anns[idx].image = this.announcementImage;
+                }
+                anns[idx].createdAt = new Date().toLocaleDateString('sw-TZ') + ' (Imehaririwa)';
+                this.showToast('Tangazo limehaririwa!');
+            }
+            this.cancelEditAnnouncement(); // Reset form
+        } else {
+            // CREATE NEW
+            const ann = { id:'ann_'+Date.now(), title, content, image:this.announcementImage||null, visible:true, createdBy:auth.currentUser.username, createdAt:new Date().toLocaleDateString('sw-TZ') };
+            anns.unshift(ann);
+            this.showToast('Tangazo limewechapishwa!');
+            document.getElementById('annTitleInput').value=''; document.getElementById('annContentInput').value=''; this.removeImage();
+        }
+        
+        this.saveAnnouncements(anns);
+        this.renderAnnouncements();
+    },
+
+    toggleAnn(id) { const a = this.getAnnouncements(); const ann = a.find(x=>x.id===id); if (ann) { ann.visible=!ann.visible; this.saveAnnouncements(a); this.renderAnnouncements(); } },
+    deleteAnn(id) { this.saveAnnouncements(this.getAnnouncements().filter(a=>a.id!==id)); this.renderAnnouncements(); this.showToast('Tangazo limefutwa'); },
+    handleImageUpload(e) { const f = e.target.files[0]; if (!f) return; if (f.size>2*1024*1024) { this.showToast('Picha ni kubwa (maks 2MB)'); return; } const r = new FileReader(); r.onload = ev => { this.announcementImage=ev.target.result; document.getElementById('annFileName').textContent=f.name; document.getElementById('annImgPreview').style.display='inline-block'; document.getElementById('annImgPreviewSrc').src=ev.target.result; }; r.readAsDataURL(f); },
+    removeImage() { this.announcementImage=null; document.getElementById('annImageInput').value=''; document.getElementById('annFileName').textContent='Hakuna'; document.getElementById('annImgPreview').style.display='none'; },
+    removeImageUI() { this.announcementImage=null; document.getElementById('annFileName').textContent='Hakuna'; document.getElementById('annImgPreview').style.display='none'; },
+
+    /* --- ADMIN --- */
+    toggleAdminPanel() { const p = document.getElementById('adminPanel'); p.classList.toggle('visible'); if (p.classList.contains('visible')) { this.updateAdminPanel(); setTimeout(()=>p.scrollIntoView({behavior:'smooth',block:'start'}),100); } },
+
+    updateAdminPanel() {
+        if (!auth.currentUser) return;
+        const isSA = auth.currentUser.role==='super_admin'; const isA = auth.currentUser.role==='admin';
+        if (!isSA && !isA) { document.getElementById('adminPanel').classList.remove('visible'); return; }
+        const rEl = document.getElementById('adminPanelRole');
+        rEl.textContent = isSA ? 'SUPER ADMIN' : 'ADMIN'; rEl.className = 'role-badge ' + auth.currentUser.role;
+        document.getElementById('userManagement').style.display = isSA ? 'block' : 'none';
+        document.getElementById('annManagement').style.display = (isSA||isA) ? 'block' : 'none';
+        this.renderUserTable();
+    },
+
+    renderUserTable() {
+        const tbody = document.getElementById('userTableBody');
+        const isSA = auth.currentUser.role==='super_admin';
+        tbody.innerHTML = auth.users.map(u => {
+            let devices = DeviceDetect.getUserDevices(u.id);
+            let regNums = []; try { regNums = JSON.parse(localStorage.getItem('fh_registeredNumbers_'+u.id)||'[]'); } catch(e) {}
+            let acts = '';
+            if (u.id !== auth.currentUser.id) {
+                if (isSA) {
+                    if (u.role==='user') acts += `<button class="tbl-btn role-up" onclick="app.changeRole('${u.id}','admin')"><span class="material-icons-round" style="font-size:13px">arrow_upward</span>Admin</button>`;
+                    if (u.role==='admin') acts += `<button class="tbl-btn role-down" onclick="app.changeRole('${u.id}','user')"><span class="material-icons-round" style="font-size:13px">arrow_downward</span>User</button>`;
+                    acts += `<button class="tbl-btn del" onclick="app.deleteUser('${u.id}')"><span class="material-icons-round" style="font-size:13px">delete</span>Futa</button>`;
+                } else if (auth.currentUser.role==='admin' && u.role==='user') {
+                    // Regular admin cannot delete users, only view them or manage roles if allowed (here strict SA control for delete)
+                    // acts += `<span style="font-size:.7rem;color:var(--text3)">Haki hizi za SA</span>`;
+                }
+            } else acts = '<span style="font-size:.72rem;color:var(--text3)">(Wewe)</span>';
+            const devDisplay = devices.length > 0 ? devices.map(d => `<span style="font-size:.7rem;background:var(--accent-light);color:#D97706;padding:2px 6px;border-radius:6px;margin:1px;display:inline-block">${d.type.substring(0,8)}</span>`).join('') : '<span style="font-size:.72rem;color:var(--text3)">-</span>';
+            const numDisplay = regNums.length > 0 ? regNums.map(n => `<span style="font-size:.7rem;background:var(--primary-light);padding:2px 6px;border-radius:6px;margin:1px;display:inline-block">${this.escHTML(n)}</span>`).join('') : '<span style="font-size:.72rem;color:var(--text3)">-</span>';
+            return `<tr><td><strong>${this.escHTML(u.username.includes('@')?u.username.split('@')[0]:u.username)}</strong> ${u.online?'<span class="active-dot" style="display:inline-block;width:5px;height:5px;margin-left:3px;vertical-align:middle"></span>':''}</td><td><span class="role-badge ${u.role}">${u.role==='super_admin'?'SUPER ADMIN':u.role.toUpperCase()}</span></td><td style="max-width:120px">${devDisplay}</td><td style="max-width:160px">${numDisplay}</td><td><div class="actions">${acts}</div></td></tr>`;
+        }).join('');
+    },
+
+    changeRole(uid, role) { if (!auth.currentUser||auth.currentUser.role!=='super_admin') return; const u = auth.users.find(x=>x.id===uid); if (!u||u.role==='super_admin') return; u.role=role; auth.saveUsers(); this.updateAdminPanel(); this.showToast('Jukumu limebadilishwa.'); },
+    deleteUser(uid) {
+        if (!auth.currentUser) return; const u = auth.users.find(x=>x.id===uid);
+        if (!u||u.role==='super_admin') return;
+        if (auth.currentUser.role==='admin'&&u.role!=='user') return;
+        if (u.id===auth.currentUser.id) return;
+        ['usage','limits','calls','socialLinks','newsLinks','lastDate','registeredNumbers','settings'].forEach(k => localStorage.removeItem('fh_'+k+'_'+uid));
+        auth.users = auth.users.filter(x=>x.id!==uid); auth.saveUsers();
+        this.updateAdminPanel(); this.updateActiveUsers(); this.showToast('Mtumiaji amefutwa.');
+    },
+
+    /* --- MIPANGILIO --- */
+    openSettings() {
+        ['social','chat','call','incoming','news'].forEach(k => { 
+            if(document.getElementById('limit-'+k)) {
+                document.getElementById('limit-'+k).value=this.limits[k] || 0; 
+                document.getElementById('val-'+k).textContent = this.limits[k] || 0;
+            }
+        });
+        document.getElementById('inputPhoneNumber').value = this.callTracking.phoneNumber;
+        document.getElementById('currentPhoneDisplay').textContent = this.callTracking.phoneNumber || '-';
+        document.getElementById('autoReplyMsg').value = this.autoReplyMsg;
+        document.getElementById('simulateUnknown').checked = this.simulateUnknown;
+        
+        this.renderLinkManagers(); this.renderColorPickers(); this.renderRegisteredNumbers();
+        document.getElementById('settingsModal').classList.add('active');
+    },
+    closeSettings() { document.getElementById('settingsModal').classList.remove('active'); },
+    switchTab(t) {
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+        document.querySelector('.tab-btn[data-tab="'+t+'"]').classList.add('active');
+        document.getElementById('tab-'+t).classList.add('active');
+    },
+    saveLimits() {
+        ['social','chat','call','incoming','news'].forEach(k => { 
+            if(document.getElementById('limit-'+k)) {
+                this.limits[k] = parseInt(document.getElementById('limit-'+k).value);
+            }
+        });
+        this.saveData(); this.renderAll(); this.showToast('Mipaka imehifadhiwa'); this.closeSettings();
+    },
+    savePhone() {
+        const num = document.getElementById('inputPhoneNumber').value.trim();
+        if (num && !this.isNumberRegistered(num)) { this.showToast('Namba HAIJASAJILIWA. Sajili kwanza.'); return; }
+        this.callTracking.phoneNumber = num; this.saveData();
+        document.getElementById('currentPhoneDisplay').textContent = num || '-';
+        this.renderRegisteredNumbers(); this.updateUI(); this.updateCallButtonStates();
+        
+        // Save Simulation Settings
+        this.autoReplyMsg = document.getElementById('autoReplyMsg').value.trim() || this.autoReplyMsg;
+        this.saveData();
+        
+        this.showToast('Namba na Mipangilio imehifadhiwa'); this.closeSettings();
+    },
+
+    /* --- UTILITIES --- */
+    showToast(msg) {
+        const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+        clearTimeout(this._tt); this._tt = setTimeout(() => t.classList.remove('show'), 3500);
+    },
+    escHTML(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+};
+
+/* ===== ANZISHA ===== */
+document.addEventListener('DOMContentLoaded', () => auth.init());
+</script>
+</body>
+</html> 
